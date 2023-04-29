@@ -1,0 +1,33 @@
+version: '3.9'
+name: tp1
+services:
+    server:
+        volumes:
+            - ./server/config.ini:/config.ini
+        container_name: server
+        build: ./server
+        entrypoint: python3 /main.py
+        environment:
+            - LOGGING_LEVEL=DEBUG
+        networks:
+            - testing_net
+
+    client:
+        container_name: client
+        volumes:
+            - ./client/config.ini:/config.ini
+        build: ./client
+        entrypoint: python3 /main.py
+        environment:
+            - LOGGING_LEVEL=DEBUG
+        networks:
+            - testing_net
+        depends_on:
+            - server
+
+networks:
+    testing_net:
+        ipam:
+            driver: default
+            config:
+                - subnet: 172.25.125.0/24
