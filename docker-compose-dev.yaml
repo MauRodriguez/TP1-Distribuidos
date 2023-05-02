@@ -5,12 +5,18 @@ services:
         volumes:
             - ./server/config.ini:/config.ini
         container_name: server
-        build: ./server
-        entrypoint: python3 /main.py
+        build: 
+            context: ./server
+            dockerfile: ./endpoint/Dockerfile
+        entrypoint: python3 ./endpoint/main.py
+        depends_on:
+            rabbitmq:
+                condition: service_healthy
         environment:
-            - LOGGING_LEVEL=DEBUG
+            - LOGGING_LEVEL=INFO  
         networks:
-            - testing_net
+            - client-server
+            - rabbitmq-net
 
     client:
         container_name: client
@@ -19,15 +25,66 @@ services:
         build: ./client
         entrypoint: python3 /main.py
         environment:
-            - LOGGING_LEVEL=DEBUG
+            - LOGGING_LEVEL=INFO
         networks:
-            - testing_net
+            - client-server
         depends_on:
             - server
+    
+    weather_processor:
+        container_name: 'weather_processor'
+        build: 
+            context: ./server
+            dockerfile: ./weather_processor/Dockerfile
+        entrypoint: python3 ./weather_processor/main.py
+        networks:
+            - rabbitmq-net
+        depends_on:
+            rabbitmq:
+                condition: service_healthy
+        environment:
+            - LOGGING_LEVEL=DEBUG
+            
+    trips_processor:
+        container_name: 'trips_processor'
+        build: 
+            context: ./server
+            dockerfile: ./trips_processor/Dockerfile
+        entrypoint: python3 ./trips_processor/main.py
+        networks:
+            - rabbitmq-net
+        depends_on:
+            rabbitmq:
+                condition: service_healthy
+        environment:
+            - LOGGING_LEVEL=DEBUG    
+
+    rabbitmq:
+        container_name: 'rabbitmq'
+        image: rabbitmq:3.9.16-management-alpine
+        networks:
+            - rabbitmq-net
+        ports:
+            - 5672:5672
+            - 15672:15672
+        healthcheck:
+            test: rabbitmq-diagnostics -q ping
+            interval: 10s
+            timeout: 5s
+            retries: 10
 
 networks:
-    testing_net:
+    rabbitmq-net:
+        driver: bridge
+    client-server:
         ipam:
             driver: default
             config:
                 - subnet: 172.25.125.0/24
+
+        
+
+
+                
+
+  

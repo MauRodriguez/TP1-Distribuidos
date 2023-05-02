@@ -6,7 +6,7 @@ import logging
 def initialize_config():
 
     config = ConfigParser(os.environ)
-    config.read("config.ini")
+    config.read("endpoint/config.ini")
 
     config_params = {}
     try:
