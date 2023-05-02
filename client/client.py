@@ -16,27 +16,28 @@ class Client:
         self.keep_running = True
     
     def run(self):
-        
-        self.socket.connect()
-        logging.info(f"action: connect | result: success")
+        try:        
+            self.socket.connect()
+            logging.info(f"action: connect | result: success")
 
-        self.read_and_send("montreal", "weather", WEATHER)
-        self.read_and_send("toronto", "weather", WEATHER)
-        self.read_and_send("washington", "weather", WEATHER)
-        self.send_msg(END, WEATHER.encode("utf-8"))
-        logging.info(f"action: end of sending weather")
+            self.read_and_send("montreal", "weather", WEATHER)
+            self.read_and_send("toronto", "weather", WEATHER)
+            self.read_and_send("washington", "weather", WEATHER)
+            self.send_msg(END, WEATHER.encode("utf-8"))
+            logging.info(f"action: end of sending weather")
 
-        # self.read_and_send("montreal", "stations", STATION)
-        # self.read_and_send("toronto", "stations", STATION)
-        # self.read_and_send("washington", "stations", STATION)
-        # self.send_msg(END, STATION.encode("utf-8"))
+            # self.read_and_send("montreal", "stations", STATION)
+            # self.read_and_send("toronto", "stations", STATION)
+            # self.read_and_send("washington", "stations", STATION)
+            # self.send_msg(END, STATION.encode("utf-8"))
 
-        self.read_and_send("montreal", "trips", TRIP)
-        self.read_and_send("toronto", "trips", TRIP)
-        self.read_and_send("washington", "trips", TRIP)  
-        self.send_msg(END, TRIP.encode("utf-8"))      
-        logging.info(f"action: end of sending trips")
-
+            self.read_and_send("montreal", "trips", TRIP)
+            self.read_and_send("toronto", "trips", TRIP)
+            self.read_and_send("washington", "trips", TRIP)  
+            self.send_msg(END, TRIP.encode("utf-8"))      
+            logging.info(f"action: end of sending trips")
+        except OSError as e:
+            pass
         self.socket.close()
         logging.info(f"action: close | result: success")
     
@@ -51,7 +52,7 @@ class Client:
 
             batch = "".encode('utf-8')
             for i, line in enumerate(reader):
-                if 100 % i > 20 and type == TRIP:
+                if i % 100 > 20 and type == TRIP:
                     continue            
                 data = (','.join(line)) + ";"
                 data_encoded = data.encode("utf-8")
@@ -64,12 +65,8 @@ class Client:
             self.send_msg(type, batch)
     
     def send_msg(self, type, msg): 
-        try:
-            self.socket.send(type.encode("utf-8"))
-            self.socket.send(len(msg).to_bytes(4, "little", signed=False))
-            self.socket.send(msg)
-        except socket.error as e:
-            self.socket.close()
-            self.keep_running = False
+        self.socket.send(type.encode("utf-8"))
+        self.socket.send(len(msg).to_bytes(4, "little", signed=False))
+        self.socket.send(msg)
 
         

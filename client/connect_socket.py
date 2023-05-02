@@ -41,3 +41,4 @@ class ConnectSocket:
             logging.debug(f"action: sendall | result: success")
         except socket.error as e:
             logging.error(f"action: sendall | result: error | error: {repr(e)}")
+            raise OSError

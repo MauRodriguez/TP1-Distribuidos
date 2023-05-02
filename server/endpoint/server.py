@@ -19,7 +19,7 @@ class Server:
     def run(self):
         client_socket = self.socket_listener.accept()
 
-        result = self.rabbit.declare_exchange("dispatcher", "topics")
+        result = self.rabbit.declare_exchange("dispatcher", "topic")
         
         while self.keep_running:
             type = client_socket.recv(1).decode("utf-8")
@@ -40,13 +40,14 @@ class Server:
                 if msg == WEATHER:
                     routing_key = "weather"
                 if msg == TRIP:
+                    self.keep_running = False
                     routing_key = "trips"               
 
                 self.rabbit.publish(exchange="dispatcher", routing_key=routing_key, msg=type + '|' + msg)
-                self.keep_running = False
+                
                 continue
             
-            self.rabbit.publish(exchange="", routing_key=routing_key, msg=msg)
+            self.rabbit.publish(exchange="dispatcher", routing_key=routing_key, msg=msg)
 
         
         self.rabbit.close()
