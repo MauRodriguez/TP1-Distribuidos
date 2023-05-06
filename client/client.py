@@ -23,18 +23,18 @@ class Client:
             self.read_and_send("montreal", "weather", WEATHER)
             self.read_and_send("toronto", "weather", WEATHER)
             self.read_and_send("washington", "weather", WEATHER)
-            self.send_msg(END, WEATHER.encode("utf-8"))
+            self.send_msg(WEATHER, END.encode("utf-8"))
             logging.info(f"action: end of sending weather")
 
             # self.read_and_send("montreal", "stations", STATION)
             # self.read_and_send("toronto", "stations", STATION)
             # self.read_and_send("washington", "stations", STATION)
-            # self.send_msg(END, STATION.encode("utf-8"))
+            # self.send_msg(STATION, END.encode("utf-8"))
 
             self.read_and_send("montreal", "trips", TRIP)
             self.read_and_send("toronto", "trips", TRIP)
             self.read_and_send("washington", "trips", TRIP)  
-            self.send_msg(END, TRIP.encode("utf-8"))      
+            self.send_msg(TRIP, END.encode("utf-8"))      
             logging.info(f"action: end of sending trips")
         except OSError as e:
             pass
@@ -54,7 +54,7 @@ class Client:
             for i, line in enumerate(reader):
                 if i % 100 > 20 and type == TRIP:
                     continue            
-                data = (','.join(line)) + ";"
+                data = city[0] + "," + (','.join(line)) + ";"
                 data_encoded = data.encode("utf-8")
 
                 if(len(batch) + len(data_encoded)) >= MAX_MSG_LENGHT:
