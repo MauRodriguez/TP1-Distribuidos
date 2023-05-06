@@ -57,7 +57,21 @@ services:
             rabbitmq:
                 condition: service_healthy
         environment:
-            - LOGGING_LEVEL=DEBUG    
+            - LOGGING_LEVEL=DEBUG 
+
+    rainy_days:
+        container_name: 'rainy_days'
+        build: 
+            context: ./server
+            dockerfile: ./rainy_days/Dockerfile
+        entrypoint: python3 ./rainy_days/main.py
+        networks:
+            - rabbitmq-net
+        depends_on:
+            rabbitmq:
+                condition: service_healthy
+        environment:
+            - LOGGING_LEVEL=DEBUG   
 
     rabbitmq:
         container_name: 'rabbitmq'

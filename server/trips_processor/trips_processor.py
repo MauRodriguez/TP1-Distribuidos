@@ -2,26 +2,35 @@ import logging
 import sys
 sys.path.append("..")
 from rabbitmq.rabbit import Rabbitmq
-import time
+END = "E"
 
 class TripsProcessor :
     def __init__(self):
         self.rabbit = Rabbitmq()
 
     def callback(self, ch, method, properties, body):
-        if body.decode('utf-8')[0] == "E":
+        body = body.decode('utf-8')
+        if body == END:
             logging.info("End of trips received")
+            self.rabbit.publish("","test2", body) 
             ch.close()
+            return
+        rows = body.split(';')
+        filter_data = ""
+        
+        for row in rows:
+            cols = row.split(',') 
+            if len(cols) < 2: continue
+            city = cols[0] 
+            date = cols[1].split(' ')[0]
+            duration = cols[5]
+            filter_data += city + "," + date + "," + duration + ";"  
+
+        self.rabbit.publish("","test2",filter_data) 
 
     def run(self):
-        result = self.rabbit.declare_queue("trips")
-
-        self.rabbit.declare_exchange("dispatcher","topic")
-
         self.rabbit.bind("dispatcher", "trips", "trips")
 
         self.rabbit.consume("trips", self.callback)
-
-        self.rabbit.start_consuming()
 
         self.rabbit.close()

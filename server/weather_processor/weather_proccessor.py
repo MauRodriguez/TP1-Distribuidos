@@ -2,27 +2,34 @@ import sys
 sys.path.append("..")
 from rabbitmq.rabbit import Rabbitmq
 import logging
-import time
+END = "E"
 
 class WeatherProccessor:
     def __init__(self):
         self.rabbit = Rabbitmq()
 
     def callback(self, ch, method, properties, body):
-        if body.decode('utf-8')[0] == "E":
+        body = body.decode('utf-8')
+        if body == END:
             logging.info("End of weathers received")
+            self.rabbit.publish("","test",body)
             ch.close()
+            return
+        rows = body.split(';')
+        filter_data = ""
+
+        for row in rows:
+            cols = row.split(',')
+            if len(cols) < 3: continue
+            city = cols[0]
+            date = cols[1]  
+            prec = cols[2]
+            filter_data += city + "," + date + "," + prec + ";"  
+
+        self.rabbit.publish("","test",filter_data)   
 
     def run(self):
-        result = self.rabbit.declare_queue("weather")
-
-        self.rabbit.declare_exchange("dispatcher","topic")
-
         self.rabbit.bind("dispatcher", "weather", "weather")
-
         self.rabbit.consume("weather", self.callback)
-
-        self.rabbit.start_consuming()
-
         self.rabbit.close()
 
