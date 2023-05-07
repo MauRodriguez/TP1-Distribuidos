@@ -1,7 +1,7 @@
 import logging
 import os
 from configparser import ConfigParser
-from rainy_days import RainyDays
+from duration_mean import DurationMean
 
 def initialize_config():
 
@@ -23,13 +23,17 @@ def initialize_log(logging_level):
         format='%(asctime)s %(levelname)-8s %(message)s',
         level=logging_level,
         datefmt='%Y-%m-%d %H:%M:%S',
-    )    
+    )
+
+def print_hello(ch, method, properties, body):
+    logging.info(body) 
+    
 
 def main():
     config_params = initialize_config()
     initialize_log(config_params["logging_level"])
 
-    rainy_days = RainyDays()
-    rainy_days.run()
+    duration_mean = DurationMean()
+    duration_mean.run()
 
 main()

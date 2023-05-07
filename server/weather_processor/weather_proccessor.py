@@ -12,7 +12,7 @@ class WeatherProccessor:
         body = body.decode('utf-8')
         if body == END:
             logging.info("End of weathers received")
-            self.rabbit.publish("","test",body)
+            self.rabbit.publish("","rain_amount",body)
             ch.close()
             return
         rows = body.split(';')
@@ -26,7 +26,7 @@ class WeatherProccessor:
             prec = cols[2]
             filter_data += city + "," + date + "," + prec + ";"  
 
-        self.rabbit.publish("","test",filter_data)   
+        self.rabbit.publish("","rain_amount",filter_data)   
 
     def run(self):
         self.rabbit.bind("dispatcher", "weather", "weather")

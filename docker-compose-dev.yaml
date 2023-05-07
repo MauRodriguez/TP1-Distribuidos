@@ -57,6 +57,20 @@ services:
             rabbitmq:
                 condition: service_healthy
         environment:
+            - LOGGING_LEVEL=DEBUG
+
+    stations_processor:
+        container_name: 'stations_processor'
+        build: 
+            context: ./server
+            dockerfile: ./stations_processor/Dockerfile
+        entrypoint: python3 ./stations_processor/main.py
+        networks:
+            - rabbitmq-net
+        depends_on:
+            rabbitmq:
+                condition: service_healthy
+        environment:
             - LOGGING_LEVEL=DEBUG 
 
     rainy_days:
@@ -71,7 +85,21 @@ services:
             rabbitmq:
                 condition: service_healthy
         environment:
-            - LOGGING_LEVEL=DEBUG   
+            - LOGGING_LEVEL=DEBUG
+
+    duration_mean:
+        container_name: 'duration_mean'
+        build: 
+            context: ./server
+            dockerfile: ./duration_mean/Dockerfile
+        entrypoint: python3 ./duration_mean/main.py
+        networks:
+            - rabbitmq-net
+        depends_on:
+            rabbitmq:
+                condition: service_healthy
+        environment:
+            - LOGGING_LEVEL=DEBUG    
 
     rabbitmq:
         container_name: 'rabbitmq'

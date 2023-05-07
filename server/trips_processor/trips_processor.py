@@ -12,7 +12,7 @@ class TripsProcessor :
         body = body.decode('utf-8')
         if body == END:
             logging.info("End of trips received")
-            self.rabbit.publish("","test2", body) 
+            self.rabbit.publish("","trip_duration", body) 
             ch.close()
             return
         rows = body.split(';')
@@ -26,7 +26,7 @@ class TripsProcessor :
             duration = cols[5]
             filter_data += city + "," + date + "," + duration + ";"  
 
-        self.rabbit.publish("","test2",filter_data) 
+        self.rabbit.publish("","trip_duration",filter_data) 
 
     def run(self):
         self.rabbit.bind("dispatcher", "trips", "trips")

@@ -24,11 +24,7 @@ def initialize_log(logging_level):
         level=logging_level,
         datefmt='%Y-%m-%d %H:%M:%S',
     )
-
-def print_hello(ch, method, properties, body):
-    logging.info(body) 
     
-
 def main():
     config_params = initialize_config()
     initialize_log(config_params["logging_level"])

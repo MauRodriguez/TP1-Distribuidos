@@ -1,7 +1,7 @@
 import logging
 import os
 from configparser import ConfigParser
-from rainy_days import RainyDays
+from stations_processor import StationsProcessor
 
 def initialize_config():
 
@@ -23,13 +23,13 @@ def initialize_log(logging_level):
         format='%(asctime)s %(levelname)-8s %(message)s',
         level=logging_level,
         datefmt='%Y-%m-%d %H:%M:%S',
-    )    
+    )
 
 def main():
     config_params = initialize_config()
     initialize_log(config_params["logging_level"])
 
-    rainy_days = RainyDays()
-    rainy_days.run()
+    stations_proccessor = StationsProcessor()
+    stations_proccessor.run()
 
 main()

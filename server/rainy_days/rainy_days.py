@@ -7,7 +7,7 @@ import time
 class RainyDays :
     def __init__(self):
         self.rabbit = Rabbitmq()
-        self.weathers = {}
+        self.weathers = {'2020-10-29': ('698.0', 1)}
 
     def callback_trips(self, ch, method, properties, body):
         body = body.decode('utf-8')
@@ -44,8 +44,8 @@ class RainyDays :
                 self.weathers[(cols[0],cols[1])] = cols[2]
 
     def run(self):
-        self.rabbit.consume("test", self.callback_weather)
+        self.rabbit.consume("rain_amount", self.callback_weather)
         self.rabbit.close()        
         self.rabbit = Rabbitmq()
-        self.rabbit.consume("test2", self.callback_trips)
+        self.rabbit.consume("trip_duration", self.callback_trips)
         self.rabbit.close()        
