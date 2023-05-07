@@ -2,7 +2,6 @@ import logging
 import sys
 sys.path.append("..")
 from rabbitmq.rabbit import Rabbitmq
-import time
 END = "E"
 
 class RainyDays :
@@ -14,6 +13,7 @@ class RainyDays :
         body = body.decode('utf-8')
         if body == END:
             logging.info("End of trips filtereds received")
+            logging.info(self.weathers)
             self.rabbit.publish("","rainy_trips",body)
             ch.close()
         rows = body.split(';')
@@ -21,7 +21,7 @@ class RainyDays :
 
         for row in rows:
             cols = row.split(',')
-            if len(cols) < 2: continue
+            if len(cols) < 3: continue
             if (cols[0],cols[1]) in self.weathers:
                 filter_data += cols[1] + "," + cols[2] + ";"
                 
@@ -39,8 +39,8 @@ class RainyDays :
         rows = body.split(';')
 
         for row in rows:
-            if len(row) == 0: continue
             cols = row.split(',')
+            if len(cols) < 3: continue
             if float(cols[2]) > 30:
                 self.weathers[(cols[0],cols[1])] = cols[2]
 

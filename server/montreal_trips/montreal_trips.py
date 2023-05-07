@@ -14,6 +14,7 @@ class MontrealTrips:
         
         if body == END:
             logging.info("End of start-end trip received")
+            self.rabbit.publish("","montreal_trips", body)
             ch.close()
             return
     

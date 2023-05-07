@@ -14,6 +14,7 @@ class MontrealStations:
         
         if body == END:
             logging.info("End of station location received")
+            self.rabbit.publish("","montreal_stations",body)
             ch.close()
             return
     

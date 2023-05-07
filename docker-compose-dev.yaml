@@ -114,6 +114,20 @@ services:
                 condition: service_healthy
         environment:
             - LOGGING_LEVEL=DEBUG
+    
+    harversine_distance:
+        container_name: 'harversine_distance'
+        build: 
+            context: ./server
+            dockerfile: ./harversine_distance/Dockerfile
+        entrypoint: python3 ./harversine_distance/main.py
+        networks:
+            - rabbitmq-net
+        depends_on:
+            rabbitmq:
+                condition: service_healthy
+        environment:
+            - LOGGING_LEVEL=DEBUG
 
     duration_mean:
         container_name: 'duration_mean'
