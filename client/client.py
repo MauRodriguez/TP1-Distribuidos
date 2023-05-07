@@ -26,10 +26,10 @@ class Client:
             self.send_msg(WEATHER, END.encode("utf-8"))
             logging.info(f"action: end of sending weather")
 
-            # self.read_and_send("montreal", "stations", STATION)
-            # self.read_and_send("toronto", "stations", STATION)
-            # self.read_and_send("washington", "stations", STATION)
-            # self.send_msg(STATION, END.encode("utf-8"))
+            self.read_and_send("montreal", "stations", STATION)
+            self.read_and_send("toronto", "stations", STATION)
+            self.read_and_send("washington", "stations", STATION)
+            self.send_msg(STATION, END.encode("utf-8"))
 
             self.read_and_send("montreal", "trips", TRIP)
             self.read_and_send("toronto", "trips", TRIP)
