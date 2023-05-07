@@ -7,15 +7,13 @@ MONTREAL = "m"
 
 class MontrealStations:
     def __init__(self):
-        self.rabbit = Rabbitmq()
-        self.rainy_trips = {}    
+        self.rabbit = Rabbitmq()   
 
     def callback(self, ch, method, properties, body):
         body = body.decode('utf-8')
         
         if body == END:
             logging.info("End of station location received")
-            logging.info(self.rainy_trips)
             ch.close()
             return
     

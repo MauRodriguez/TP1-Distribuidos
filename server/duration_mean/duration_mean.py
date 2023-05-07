@@ -14,7 +14,6 @@ class DurationMean:
         
         if body == END:
             logging.info("End of rainy trips received")
-            logging.info(self.rainy_trips)
             ch.close()
             return
     
