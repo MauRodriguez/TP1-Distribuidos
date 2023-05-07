@@ -4,16 +4,15 @@ sys.path.append("..")
 from rabbitmq.rabbit import Rabbitmq
 END = "E"
 
-class DurationMean:
+class DistanceMean:
     def __init__(self):
         self.rabbit = Rabbitmq()
-        self.rainy_trips = {}    
+        self.distances = {}    
 
     def callback(self, ch, method, properties, body):
         body = body.decode('utf-8')
-        
         if body == END:
-            logging.info("End of rainy trips received")
+            logging.info("End of distances received")
             ch.close()
             return
     
@@ -22,12 +21,12 @@ class DurationMean:
         for row in rows:
             cols = row.split(',')
             if len(cols) < 2: continue
-            if cols[0] not in self.rainy_trips:
-                self.rainy_trips[cols[0]] = (float(cols[1]), 1)
+            if cols[0] not in self.distances:
+                self.distances[cols[0]] = (float(cols[1]), 1)           
 
-            current = self.rainy_trips[cols[0]]
+            current = self.distances[cols[0]]
             current = (current[0] + float(cols[1]), current[1] + 1)
 
     def run(self):
-        self.rabbit.consume("rainy_trips", self.callback)
+        self.rabbit.consume("distances", self.callback)
         self.rabbit.close()      

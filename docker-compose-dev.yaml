@@ -142,6 +142,20 @@ services:
                 condition: service_healthy
         environment:
             - LOGGING_LEVEL=DEBUG    
+    
+    distance_mean:
+        container_name: 'distance_mean'
+        build: 
+            context: ./server
+            dockerfile: ./distance_mean/Dockerfile
+        entrypoint: python3 ./distance_mean/main.py
+        networks:
+            - rabbitmq-net
+        depends_on:
+            rabbitmq:
+                condition: service_healthy
+        environment:
+            - LOGGING_LEVEL=DEBUG 
 
     rabbitmq:
         container_name: 'rabbitmq'
