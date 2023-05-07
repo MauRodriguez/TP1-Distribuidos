@@ -58,6 +58,34 @@ services:
                 condition: service_healthy
         environment:
             - LOGGING_LEVEL=DEBUG
+        
+    montreal_stations:
+        container_name: 'montreal_stations'
+        build: 
+            context: ./server
+            dockerfile: ./montreal_stations/Dockerfile
+        entrypoint: python3 ./montreal_stations/main.py
+        networks:
+            - rabbitmq-net
+        depends_on:
+            rabbitmq:
+                condition: service_healthy
+        environment:
+            - LOGGING_LEVEL=DEBUG
+        
+    montreal_trips:
+        container_name: 'montreal_trips'
+        build: 
+            context: ./server
+            dockerfile: ./montreal_trips/Dockerfile
+        entrypoint: python3 ./montreal_trips/main.py
+        networks:
+            - rabbitmq-net
+        depends_on:
+            rabbitmq:
+                condition: service_healthy
+        environment:
+            - LOGGING_LEVEL=DEBUG
 
     stations_processor:
         container_name: 'stations_processor'
