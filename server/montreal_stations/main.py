@@ -1,7 +1,7 @@
 import logging
 import os
 from configparser import ConfigParser
-from duration_mean import DurationMean
+from montreal_stations import MontrealStations
 
 def initialize_config():
 
@@ -24,12 +24,12 @@ def initialize_log(logging_level):
         level=logging_level,
         datefmt='%Y-%m-%d %H:%M:%S',
     )
-    
+
 def main():
     config_params = initialize_config()
     initialize_log(config_params["logging_level"])
 
-    duration_mean = DurationMean()
-    duration_mean.run()
+    montreal_stations = MontrealStations()
+    montreal_stations.run()
 
 main()
