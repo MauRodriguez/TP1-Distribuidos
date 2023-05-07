@@ -3,6 +3,7 @@ import sys
 sys.path.append("..")
 from rabbitmq.rabbit import Rabbitmq
 import time
+END = "E"
 
 class RainyDays :
     def __init__(self):
@@ -11,7 +12,7 @@ class RainyDays :
 
     def callback_trips(self, ch, method, properties, body):
         body = body.decode('utf-8')
-        if body == "E":
+        if body == END:
             logging.info("End of trips filtereds received")
             self.rabbit.publish("","rainy_trips",body)
             ch.close()
@@ -30,7 +31,7 @@ class RainyDays :
     def callback_weather(self, ch, method, properties, body):
         body = body.decode('utf-8')
         
-        if body == "E":
+        if body == END:
             logging.info("End of weathers filtereds received")
             ch.close()
             return

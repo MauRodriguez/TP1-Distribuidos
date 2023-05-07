@@ -2,6 +2,7 @@ import logging
 import sys
 sys.path.append("..")
 from rabbitmq.rabbit import Rabbitmq
+END = "E"
 
 class DurationMean:
     def __init__(self):
@@ -11,7 +12,7 @@ class DurationMean:
     def callback(self, ch, method, properties, body):
         body = body.decode('utf-8')
         
-        if body == "E":
+        if body == END:
             logging.info("End of rainy trips received")
             logging.info(self.rainy_trips)
             ch.close()

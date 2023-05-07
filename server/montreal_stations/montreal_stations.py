@@ -2,6 +2,8 @@ import logging
 import sys
 sys.path.append("..")
 from rabbitmq.rabbit import Rabbitmq
+END = "E"
+MONTREAL = "m"
 
 class MontrealStations:
     def __init__(self):
@@ -11,7 +13,7 @@ class MontrealStations:
     def callback(self, ch, method, properties, body):
         body = body.decode('utf-8')
         
-        if body == "E":
+        if body == END:
             logging.info("End of station location received")
             logging.info(self.rainy_trips)
             ch.close()
@@ -22,9 +24,13 @@ class MontrealStations:
 
         for row in rows:
             cols = row.split(',')
-            if len(cols) < 2: continue
-            if (cols[0],cols[1]) in self.weathers:
-                filter_data += cols[1] + "," + cols[2] + ";"
+            if len(cols) < 5: continue
+            if cols[0] == MONTREAL:
+                code = cols[1] 
+                name = cols[2]
+                lat = cols[3]
+                long = cols[4]
+                filter_data += code + "," + name + "," + lat + "," + long + ";"
                 
         if filter_data != "":
             self.rabbit.publish("","montreal_stations",filter_data)
