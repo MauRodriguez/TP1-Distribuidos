@@ -29,7 +29,7 @@ class TripsProcessor :
             end_code = cols[4]
             duration = cols[5]
             trip_duration_data += city + "," + date + "," + duration + ";" 
-            start_end_code_trip_data += start_code + "," + end_code + ";"
+            start_end_code_trip_data += city + "," + start_code + "," + end_code + ";"
 
         if trip_duration_data != "":
             self.rabbit.publish("","trip_duration",trip_duration_data)

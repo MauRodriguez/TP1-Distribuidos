@@ -21,11 +21,12 @@ class StationsProcessor :
         for row in rows:
             cols = row.split(',') 
             if len(cols) < 5: continue
+            city = cols[0]
             code = cols[1] 
             name = cols[2]
             lat = cols[3]
             long = cols[4]
-            filter_data += code + "," + name + "," + lat + "," + long + ";"  
+            filter_data += city + "," + code + "," + name + "," + lat + "," + long + ";"  
 
         self.rabbit.publish("","station_location",filter_data) 
 
