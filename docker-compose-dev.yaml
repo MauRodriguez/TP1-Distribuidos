@@ -87,6 +87,20 @@ services:
         environment:
             - LOGGING_LEVEL=DEBUG
 
+    year_filter:
+        container_name: 'year_filter'
+        build: 
+            context: ./server
+            dockerfile: ./year_filter/Dockerfile
+        entrypoint: python3 ./year_filter/main.py
+        networks:
+            - rabbitmq-net
+        depends_on:
+            rabbitmq:
+                condition: service_healthy
+        environment:
+            - LOGGING_LEVEL=DEBUG
+
     stations_processor:
         container_name: 'stations_processor'
         build: 
@@ -107,6 +121,20 @@ services:
             context: ./server
             dockerfile: ./rainy_days/Dockerfile
         entrypoint: python3 ./rainy_days/main.py
+        networks:
+            - rabbitmq-net
+        depends_on:
+            rabbitmq:
+                condition: service_healthy
+        environment:
+            - LOGGING_LEVEL=DEBUG
+    
+    duplicate_filter:
+        container_name: 'duplicate_filter'
+        build: 
+            context: ./server
+            dockerfile: ./duplicate_filter/Dockerfile
+        entrypoint: python3 ./duplicate_filter/main.py
         networks:
             - rabbitmq-net
         depends_on:

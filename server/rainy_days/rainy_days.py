@@ -7,7 +7,7 @@ END = "E"
 class RainyDays :
     def __init__(self):
         self.rabbit = Rabbitmq()
-        self.weathers = {'2020-10-29': ('698.0', 1)}
+        self.weathers = {}
 
     def callback_trips(self, ch, method, properties, body):
         body = body.decode('utf-8')

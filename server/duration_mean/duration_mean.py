@@ -26,7 +26,7 @@ class DurationMean:
                 self.rainy_trips[cols[0]] = (float(cols[1]), 1)
 
             current = self.rainy_trips[cols[0]]
-            current = (current[0] + float(cols[1]), current[1] + 1)
+            self.rainy_trips[cols[0]] = (current[0] + float(cols[1]), current[1] + 1)
 
     def run(self):
         self.rabbit.consume("rainy_trips", self.callback)

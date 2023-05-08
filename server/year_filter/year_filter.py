@@ -13,6 +13,7 @@ class YearFilter:
     def callback(self, ch, method, properties, body):
         body = body.decode('utf-8')
         
+        
         if body == END:
             logging.info("End of 16-17 trips received")
             self.rabbit.publish("","16_17_trips", body)

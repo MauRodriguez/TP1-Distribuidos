@@ -13,11 +13,13 @@ class StationsProcessor :
         if body == END:
             logging.info("End of stations received")
             self.rabbit.publish("","station_location", body)
+            self.rabbit.publish("","stations_code_name", body) 
             ch.close()
             return
         rows = body.split(';')
-        filter_data = ""
-        
+        harversine_data = ""
+        trip_counter_data = ""
+
         for row in rows:
             cols = row.split(',') 
             if len(cols) < 5: continue
@@ -26,9 +28,14 @@ class StationsProcessor :
             name = cols[2]
             lat = cols[3]
             long = cols[4]
-            filter_data += city + "," + code + "," + name + "," + lat + "," + long + ";"  
+            harversine_data += city + "," + code + "," + name + "," + lat + "," + long + ";"  
+            trip_counter_data += city + code + "," + name + ";"
 
-        self.rabbit.publish("","station_location",filter_data) 
+        if harversine_data != "":
+            self.rabbit.publish("","station_location",harversine_data)
+        if trip_counter_data != "":
+            self.rabbit.publish("","stations_code_name", trip_counter_data) 
+        
 
     def run(self):
         self.rabbit.bind("dispatcher", "stations", "stations")
