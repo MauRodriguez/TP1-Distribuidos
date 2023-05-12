@@ -12,8 +12,7 @@ class RainyDays :
     def callback_trips(self, ch, method, properties, body):
         body = body.decode('utf-8')
         if body == END:
-            logging.info("End of trips filtereds received")
-            logging.info(self.weathers)
+            logging.info("End of trips filtereds received")            
             self.rabbit.publish("","rainy_trips",body)
             ch.close()
         rows = body.split(';')

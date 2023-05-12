@@ -14,7 +14,7 @@ class DuplicateFilter :
         body = body.decode('utf-8')
         if body == END:
             logging.info("End of 16 17 trips received")
-            logging.info(self.counts)
+            #logging.info(self.counts)
             ch.close()
             
         rows = body.split(';')
