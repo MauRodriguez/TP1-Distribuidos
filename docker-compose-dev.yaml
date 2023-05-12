@@ -197,6 +197,20 @@ services:
             rabbitmq:
                 condition: service_healthy
         environment:
+            - LOGGING_LEVEL=DEBUG
+
+    duration_mean_joiner:
+        container_name: 'duration_mean_joiner'
+        build: 
+            context: ./server
+            dockerfile: ./duration_mean_joiner/Dockerfile
+        entrypoint: python3 ./duration_mean_joiner/main.py
+        networks:
+            - rabbitmq-net
+        depends_on:
+            rabbitmq:
+                condition: service_healthy
+        environment:
             - LOGGING_LEVEL=DEBUG 
 
     rabbitmq:
