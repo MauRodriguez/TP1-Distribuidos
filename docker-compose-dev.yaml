@@ -129,12 +129,12 @@ services:
         environment:
             - LOGGING_LEVEL=DEBUG
     
-    duplicate_filter:
-        container_name: 'duplicate_filter'
+    trip_count:
+        container_name: 'trip_count'
         build: 
             context: ./server
-            dockerfile: ./duplicate_filter/Dockerfile
-        entrypoint: python3 ./duplicate_filter/main.py
+            dockerfile: ./trip_count/Dockerfile
+        entrypoint: python3 ./trip_count/main.py
         networks:
             - rabbitmq-net
         depends_on:
