@@ -143,6 +143,20 @@ services:
         environment:
             - LOGGING_LEVEL=DEBUG
     
+    trip_count_joiner:
+        container_name: 'trip_count_joiner'
+        build: 
+            context: ./server
+            dockerfile: ./trip_count_joiner/Dockerfile
+        entrypoint: python3 ./trip_count_joiner/main.py
+        networks:
+            - rabbitmq-net
+        depends_on:
+            rabbitmq:
+                condition: service_healthy
+        environment:
+            - LOGGING_LEVEL=DEBUG
+    
     harversine_distance:
         container_name: 'harversine_distance'
         build: 
