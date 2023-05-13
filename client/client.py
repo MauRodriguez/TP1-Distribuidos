@@ -8,12 +8,14 @@ TRIP = "T"
 STATION = "S"
 WEATHER = "W"
 END = "E"
+RESULT = "R"
 
 class Client:
     def __init__(self, server_address):
         splited_info = server_address.split(":")
         self.socket = ConnectSocket((splited_info[0],int(splited_info[1])))
         self.keep_running = True
+        self.results = 0
     
     def run(self):
         try:        
@@ -36,6 +38,10 @@ class Client:
             self.read_and_send("washington", "trips", TRIP)  
             self.send_msg(TRIP, END.encode("utf-8"))      
             logging.info(f"action: end of sending trips")
+
+            logging.info(f"action: receiving queries results")    
+            self.recv_queries_results()
+
         except OSError as e:
             pass
         self.socket.close()
@@ -43,7 +49,6 @@ class Client:
     
     def read_and_send(self, city, filename, type):
         if self.keep_running == False: return
-        #path = os.path.join(os.path.dirname(__file__),f"./data/montreal/weather.csv")
         path = f"data/{city}/{filename}.csv"
 
         with open(path,"r") as file:
@@ -52,7 +57,7 @@ class Client:
 
             batch = "".encode('utf-8')
             for i, line in enumerate(reader):
-                if i % 100 > 20 and type == TRIP:
+                if i % 100 > 5 and type == TRIP:
                     continue            
                 data = city[0] + "," + (','.join(line)) + ";"
                 data_encoded = data.encode("utf-8")
@@ -68,5 +73,13 @@ class Client:
         self.socket.send(type.encode("utf-8"))
         self.socket.send(len(msg).to_bytes(4, "little", signed=False))
         self.socket.send(msg)
+
+    def recv_queries_results(self):
+        while self.results < 3:
+            type = self.socket.recv(1).decode("utf-8")        
+            lenght = self.socket.recv(4)
+            msg = self.socket.recv(int.from_bytes(lenght, "little", signed=False)).decode("utf-8")
+
+            logging.info(f"RESULT: {msg}")
 
         
