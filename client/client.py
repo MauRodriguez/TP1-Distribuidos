@@ -57,8 +57,8 @@ class Client:
 
             batch = "".encode('utf-8')
             for i, line in enumerate(reader):
-                if i % 100 > 5 and type == TRIP:
-                    continue            
+                # if i % 100 > 20 and type == TRIP:
+                #     continue            
                 data = city[0] + "," + (','.join(line)) + ";"
                 data_encoded = data.encode("utf-8")
 
@@ -79,7 +79,8 @@ class Client:
             type = self.socket.recv(1).decode("utf-8")        
             lenght = self.socket.recv(4)
             msg = self.socket.recv(int.from_bytes(lenght, "little", signed=False)).decode("utf-8")
-
+            if msg[-2] == END:
+                self.results += 1
             logging.info(f"RESULT: {msg}")
 
         

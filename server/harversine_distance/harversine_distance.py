@@ -24,6 +24,7 @@ class HaversineDistance :
         for row in rows:
             cols = row.split(',')
             if len(cols) < 2: continue
+            if cols[0] not in self.stations or cols[1] not in self.stations: continue
             city_1 = self.stations[cols[0]]
             city_2 = self.stations[cols[1]]
 
