@@ -4,6 +4,7 @@ sys.path.append("..")
 from rabbitmq.rabbit import Rabbitmq
 END = "E"
 MAX_MSG_LENGHT = 8192
+QUERY = "Q1"
 
 class DurationMeanJoiner:
     def __init__(self):
@@ -11,21 +12,20 @@ class DurationMeanJoiner:
         self.duration = {}    
 
     def calculate_mean_duration(self):
-        response = ""
-        
-        for city in self.duration:  
-            distance = self.duration[city][0]
-            trips = self.duration[city][1]
-            mean = distance / trips
-            if mean < 6: continue
-            new_data = city + ";"
+        response = f"{QUERY};"
+
+        for day in self.duration:  
+            duration = self.duration[day][0]
+            trips = self.duration[day][1]
+            mean = duration / trips
+            new_data = day + "," + str(mean) + ";"
             if len(response + new_data) > MAX_MSG_LENGHT:
-                self.rabbit.publish("","distance_join", response)
-                response = ""
+                self.rabbit.publish("","result", response)
+                response = f"{QUERY};"
             response += new_data
         
-        self.rabbit.publish("", "distance_result", response)                
-        self.rabbit.publish("", "distance_result", END)
+        self.rabbit.publish("", "result", response)                
+        self.rabbit.publish("", "result", QUERY + "," + END + ";")
 
     def callback(self, ch, method, properties, body):
         body = body.decode('utf-8')
@@ -43,7 +43,7 @@ class DurationMeanJoiner:
                 self.duration[cols[0]] = (float(cols[1]), int(cols[2]))
                 continue           
 
-            self.duration[cols[0]] = (self.duration[cols[0]][0] + float(cols[1]), self.duration[cols[0]][1] + cols[2])
+            self.duration[cols[0]] = (self.duration[cols[0]][0] + float(cols[1]), self.duration[cols[0]][1] + int(cols[2]))
 
     def run(self):
         self.rabbit.consume("duration_mean", self.callback)

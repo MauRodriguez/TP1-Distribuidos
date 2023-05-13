@@ -21,7 +21,8 @@ class DurationMean:
                 self.rabbit.publish("","duration_mean", response)
                 response = ""
             response += new_data
-                
+            
+        self.rabbit.publish("","duration_mean", response)
         self.rabbit.publish("", "duration_mean", END)   
 
     def callback(self, ch, method, properties, body):
