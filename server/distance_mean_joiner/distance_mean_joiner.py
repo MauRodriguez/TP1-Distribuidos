@@ -20,7 +20,7 @@ class DistanceMeanJoiner:
             trips = self.distances[city][1]
             mean = distance / trips
             if mean < 6: continue
-            new_data = city + ";"
+            new_data = city + "," + str(mean) + ";"
             if len(response + new_data) > MAX_MSG_LENGHT:
                 self.rabbit.publish("","distance_join", response)
                 response = f"{QUERY};"

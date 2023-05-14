@@ -19,7 +19,7 @@ class TripCountJoiner:
             trips_16 = self.count[city][0]
             trips_17 = self.count[city][1]
             if (2 * trips_16) > trips_17: continue
-            new_data = city + ";"
+            new_data = city + "," + str(trips_16) + "," + str(trips_17) + ";"
             if len(response + new_data) > MAX_MSG_LENGHT:
                 self.rabbit.publish("","result", response)
                 response = f"{QUERY};"

@@ -21,7 +21,7 @@ class HaversineDistance :
             ch.close()
         
         rows = body.split(';')
-        distances = ""
+        result = ""
 
         for row in rows:
             cols = row.split(',')
@@ -30,10 +30,13 @@ class HaversineDistance :
             city_1 = self.stations[cols[0]]
             city_2 = self.stations[cols[1]]
 
-            distances += city_2[0] + "," + str(haversine((city_1[1],city_1[2]),(city_2[1],city_2[2]))) + ";"
+            if (city_1,city_2) not in self.distances:
+                self.distances[(city_1,city_2)] = haversine((city_1[1],city_1[2]),(city_2[1],city_2[2]))
+            
+            result += city_2[0] + "," + str(self.distances[(city_1,city_2)]) + ";"
        
-        if distances != "":
-            self.rabbit.publish("","distances", distances)
+        if result != "":
+            self.rabbit.publish("","distances", result)
         
 
     def callback_stations(self, ch, method, properties, body):
