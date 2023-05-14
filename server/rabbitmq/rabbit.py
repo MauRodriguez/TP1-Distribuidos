@@ -41,5 +41,9 @@ class Rabbitmq:
     def start_consuming(self):
         self.channel.start_consuming()
 
-    def close(self):
+    def close(self):        
+        if self.check_close(): return
         self.connection.close()
+    
+    def check_close(self):
+        return (self.connection.is_closed or self.channel.is_closed)

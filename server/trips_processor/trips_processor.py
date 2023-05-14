@@ -2,19 +2,20 @@ import logging
 import sys
 sys.path.append("..")
 from rabbitmq.rabbit import Rabbitmq
+import pika
 END = "E"
 
 class TripsProcessor :
     def __init__(self):
         self.rabbit = Rabbitmq()
 
-    def callback(self, ch, method, properties, body):
+    def callback(self, ch, method, properties, body):        
         body = body.decode('utf-8')
         if body == END:
             logging.info("End of trips received")
             self.rabbit.publish("","trip_duration", body) 
             self.rabbit.publish("","start_end_code_trip", body)
-            self.rabbit.publish("","year_and_start_station",body)
+            self.rabbit.publish("","year_and_start_station",body)            
             ch.close()
             return
         rows = body.split(';')
@@ -41,11 +42,19 @@ class TripsProcessor :
             self.rabbit.publish("","start_end_code_trip",start_end_code_trip_data)
         if year_data != "":
             self.rabbit.publish("","year_and_start_station",year_data)
-
+        
+    def stop(self):
+        self.rabbit.close()
+        logging.info(f"Trips Processor Gracefully closing")
 
     def run(self):
-        self.rabbit.bind("dispatcher", "trips", "trips")
-
-        self.rabbit.consume("trips", self.callback)
-
+        try:
+            self.rabbit.bind("dispatcher", "trips", "trips")
+            self.rabbit.consume("trips", self.callback)
+        except pika.exceptions.ChannelWrongStateError as e:
+            logging.info(f"Exiting. Pika Exception: {e}")
+        except OSError as e:
+            logging.info(f"Exiting. OSError: {e}")
+        except AttributeError as e:
+            logging.info(f"Exiting. AttributeError: {e}")
         self.rabbit.close()

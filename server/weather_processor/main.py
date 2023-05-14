@@ -1,3 +1,5 @@
+import signal
+from functools import partial 
 import logging
 import os
 from configparser import ConfigParser
@@ -30,6 +32,11 @@ def main():
     initialize_log(config_params["logging_level"])
     
     weather_proccessor = WeatherProccessor()
+    signal.signal(signal.SIGTERM, partial(handle_sigterm, weather_proccessor))
     weather_proccessor.run()
+
+def handle_sigterm(weather_proccessor, signum, frame):
+    weather_proccessor.stop()
+    logging.info(f"Sigterm received with signum {signum} frame {frame}")
 
 main()

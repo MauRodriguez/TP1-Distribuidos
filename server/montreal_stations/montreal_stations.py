@@ -2,6 +2,7 @@ import logging
 import sys
 sys.path.append("..")
 from rabbitmq.rabbit import Rabbitmq
+import pika
 END = "E"
 MONTREAL = "m"
 
@@ -33,7 +34,18 @@ class MontrealStations:
                 
         if filter_data != "":
             self.rabbit.publish("","montreal_stations",filter_data)
+    
+    def stop(self):
+        self.rabbit.close()
+        logging.info(f"Montreal Stations Gracefully closing")
 
     def run(self):
-        self.rabbit.consume("station_location", self.callback)
+        try:
+            self.rabbit.consume("station_location", self.callback)
+        except pika.exceptions.ChannelWrongStateError as e:
+            logging.info(f"Exiting. Pika Exception: {e}")
+        except OSError as e:
+            logging.info(f"Exiting. OSError: {e}")
+        except AttributeError as e:
+            logging.info(f"Exiting. AttributeError: {e}")
         self.rabbit.close()      

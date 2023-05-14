@@ -1,3 +1,5 @@
+import signal
+from functools import partial 
 import logging
 import os
 from configparser import ConfigParser
@@ -30,6 +32,11 @@ def main():
     initialize_log(config_params["logging_level"])
 
     distance_mean_joiner = DistanceMeanJoiner()
+    signal.signal(signal.SIGTERM, partial(handle_sigterm, distance_mean_joiner))
     distance_mean_joiner.run()
+
+def handle_sigterm(distance_mean_joiner, signum, frame):
+    distance_mean_joiner.stop()
+    logging.info(f"Sigterm received with signum {signum} frame {frame}")
 
 main()

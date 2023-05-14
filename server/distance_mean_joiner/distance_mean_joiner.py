@@ -2,6 +2,7 @@ import logging
 import sys
 sys.path.append("..")
 from rabbitmq.rabbit import Rabbitmq
+import pika
 END = "E"
 MAX_MSG_LENGHT = 8192
 QUERY = "Q3"
@@ -46,6 +47,17 @@ class DistanceMeanJoiner:
 
             self.distances[cols[0]] = (self.distances[cols[0]][0] + float(cols[1]), self.distances[cols[0]][1] + int(cols[2]))
 
+    def stop(self):
+        self.rabbit.close()
+        logging.info(f"Distance Mean Joiner Gracefully closing")
+    
     def run(self):
-        self.rabbit.consume("distance_mean", self.callback)
+        try:
+            self.rabbit.consume("distance_mean", self.callback)
+        except pika.exceptions.ChannelWrongStateError as e:
+            logging.info(f"Exiting. Pika Exception: {e}")
+        except OSError as e:
+            logging.info(f"Exiting. OSError: {e}")
+        except AttributeError as e:
+            logging.info(f"Exiting. AttributeError: {e}")
         self.rabbit.close()      

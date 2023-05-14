@@ -2,6 +2,7 @@ import logging
 import sys
 sys.path.append("..")
 from rabbitmq.rabbit import Rabbitmq
+import pika
 END = "E"
 MAX_MSG_LENGHT = 8192
 
@@ -10,6 +11,7 @@ class TripCount :
         self.rabbit = Rabbitmq()
         self.stations = {}
         self.counts = {}
+        self.keep_running = True
 
     def send_partial_count(self):
         response = ""
@@ -61,11 +63,23 @@ class TripCount :
         for row in rows:
             cols = row.split(',')
             if len(cols) < 2: continue
-            self.stations[cols[0]] = cols[1]             
+            self.stations[cols[0]] = cols[1]   
+
+    def stop(self):
+        self.rabbit.close()
+        self.keep_running = False
+        logging.info(f"Trip Count Gracefully closing")          
 
     def run(self):
-        self.rabbit.consume("stations_code_name", self.callback_stations)
-        self.rabbit.close()        
-        self.rabbit = Rabbitmq()
-        self.rabbit.consume("16_17_trips", self.callback_trips)
+        try:
+            self.rabbit.consume("stations_code_name", self.callback_stations)
+            self.rabbit.close()        
+            if self.keep_running: self.rabbit = Rabbitmq()
+            self.rabbit.consume("16_17_trips", self.callback_trips)
+        except pika.exceptions.ChannelWrongStateError as e:
+            logging.info(f"Exiting. Pika Exception: {e}")
+        except OSError as e:
+            logging.info(f"Exiting. OSError: {e}")
+        except AttributeError as e:
+            logging.info(f"Exiting. AttributeError: {e}")
         self.rabbit.close()        

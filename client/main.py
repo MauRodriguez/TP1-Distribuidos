@@ -2,6 +2,8 @@ from client import Client
 import logging
 from configparser import ConfigParser
 import os
+import signal
+from functools import partial
 
 def initialize_config():
 
@@ -32,6 +34,11 @@ def main():
     server_address = config_params["server_address"] 
     initialize_log(logging_level)
     client = Client(server_address)
+    signal.signal(signal.SIGTERM, partial(handle_sigterm, client))
     client.run()
+
+def handle_sigterm(client, signum, frame):
+    client.stop()
+    logging.info(f"Sigterm received with signum {signum} frame {frame}") 
 
 main()

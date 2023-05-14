@@ -2,6 +2,7 @@ import sys
 sys.path.append("..")
 from rabbitmq.rabbit import Rabbitmq
 import logging
+import pika
 END = "E"
 
 class WeatherProccessor:
@@ -26,10 +27,21 @@ class WeatherProccessor:
             prec = cols[2]
             filter_data += city + "," + date + "," + prec + ";"  
 
-        self.rabbit.publish("","rain_amount",filter_data)   
+        self.rabbit.publish("","rain_amount",filter_data) 
+
+    def stop(self):
+        self.rabbit.close()
+        logging.info(f"Weather Processor Gracefully closing")  
 
     def run(self):
-        self.rabbit.bind("dispatcher", "weather", "weather")
-        self.rabbit.consume("weather", self.callback)
+        try:
+            self.rabbit.bind("dispatcher", "weather", "weather")
+            self.rabbit.consume("weather", self.callback)
+        except pika.exceptions.ChannelWrongStateError as e:
+            logging.info(f"Exiting. Pika Exception: {e}")
+        except OSError as e:
+            logging.info(f"Exiting. OSError: {e}")
+        except AttributeError as e:
+            logging.info(f"Exiting. AttributeError: {e}")
         self.rabbit.close()
 

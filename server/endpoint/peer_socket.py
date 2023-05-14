@@ -22,7 +22,8 @@ class PeerSocket:
 
             return received_msg
         except socket.error as e:
-            logging.error(f"action: recv | result: error | error: {repr(e)}") 
+            logging.error(f"action: recv | result: error | error: {repr(e)}")
+            raise OSError 
         
     def send(self, msg):
         try:

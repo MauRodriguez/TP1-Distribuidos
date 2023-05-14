@@ -2,6 +2,7 @@ import logging
 import sys
 sys.path.append("..")
 from rabbitmq.rabbit import Rabbitmq
+import pika
 END = "E"
 
 class StationsProcessor :
@@ -36,10 +37,19 @@ class StationsProcessor :
         if trip_counter_data != "":
             self.rabbit.publish("","stations_code_name", trip_counter_data) 
         
+    def stop(self):
+        self.rabbit.close()
+        logging.info(f"Station Processor Gracefully closing")
 
     def run(self):
-        self.rabbit.bind("dispatcher", "stations", "stations")
-
-        self.rabbit.consume("stations", self.callback)
+        try:
+            self.rabbit.bind("dispatcher", "stations", "stations")
+            self.rabbit.consume("stations", self.callback)
+        except pika.exceptions.ChannelWrongStateError as e:
+            logging.info(f"Exiting. Pika Exception: {e}")
+        except OSError as e:
+            logging.info(f"Exiting. OSError: {e}")
+        except AttributeError as e:
+            logging.info(f"Exiting. AttributeError: {e}")
 
         self.rabbit.close()

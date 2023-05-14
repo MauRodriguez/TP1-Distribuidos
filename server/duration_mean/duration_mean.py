@@ -2,6 +2,7 @@ import logging
 import sys
 sys.path.append("..")
 from rabbitmq.rabbit import Rabbitmq
+import pika
 END = "E"
 MAX_MSG_LENGHT = 8192
 
@@ -45,6 +46,17 @@ class DurationMean:
             current = self.trips_duration[cols[0]]
             self.trips_duration[cols[0]] = (current[0] + float(cols[1]), current[1] + 1)
 
+    def stop(self):
+        self.rabbit.close()
+        logging.info(f"Duration Mean Gracefully closing")
+    
     def run(self):
-        self.rabbit.consume("rainy_trips", self.callback)
+        try:
+            self.rabbit.consume("rainy_trips", self.callback)
+        except pika.exceptions.ChannelWrongStateError as e:
+            logging.info(f"Exiting. Pika Exception: {e}")
+        except OSError as e:
+            logging.info(f"Exiting. OSError: {e}")
+        except AttributeError as e:
+            logging.info(f"Exiting. AttributeError: {e}")
         self.rabbit.close()      

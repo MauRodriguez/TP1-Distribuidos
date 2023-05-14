@@ -4,6 +4,7 @@ import sys
 sys.path.append("..")
 from rabbitmq.rabbit import Rabbitmq
 import logging
+import pika
 
 TRIP = "T"
 STATION = "S"
@@ -21,11 +22,18 @@ class Server:
         self.queries_finished = 0
     
     def run(self):
-        self.client_socket = self.socket_listener.accept()
-        
-        self.receive()
-        self.rabbit.consume("result", self.send_results)
-        
+        try:
+            self.client_socket = self.socket_listener.accept()
+            
+            self.receive()
+            self.rabbit.consume("result", self.send_results)
+        except pika.exceptions.ChannelWrongStateError as e:
+            logging.info(f"Exiting. Pika Exception: {e}")
+        except OSError as e:
+            logging.info(f"Exiting. OSError: {e}")
+        except AttributeError as e:
+            logging.info(f"Exiting. AttributeError: {e}")
+
         self.rabbit.close()
         self.client_socket.close()
         self.socket_listener.close()
@@ -50,6 +58,13 @@ class Server:
         self.client_socket.send(RESULT.encode("utf-8"))
         self.client_socket.send(len(msg).to_bytes(4, "little", signed=False))
         self.client_socket.send(msg)
+    
+    def stop(self):
+        self.client_socket.close()
+        self.socket_listener.close()
+        self.rabbit.close()
+        self.keep_receiving = False
+        logging.info(f"Server Gracefully closing")
 
     def receive(self):
         while self.keep_receiving:

@@ -2,6 +2,7 @@ import logging
 import sys
 sys.path.append("..")
 from rabbitmq.rabbit import Rabbitmq
+import pika
 from haversine import haversine
 END = "E"
 
@@ -9,7 +10,8 @@ class HaversineDistance :
     def __init__(self):
         self.rabbit = Rabbitmq()
         self.stations = {}
-
+        self.distances = {}
+        self.keep_running = True
 
     def callback_trips(self, ch, method, properties, body):
         body = body.decode('utf-8')
@@ -47,10 +49,22 @@ class HaversineDistance :
             cols = row.split(',')
             if len(cols) < 4: continue
             self.stations[cols[0]] = (cols[1],float(cols[2]), float(cols[3]))
+    
+    def stop(self):
+        self.rabbit.close()
+        self.keep_running = False
+        logging.info(f"Haversine Gracefully closing")
 
     def run(self):
-        self.rabbit.consume("montreal_stations", self.callback_stations)
-        self.rabbit.close()        
-        self.rabbit = Rabbitmq()
-        self.rabbit.consume("montreal_trips", self.callback_trips)
+        try:
+            self.rabbit.consume("montreal_stations", self.callback_stations)
+            self.rabbit.close()        
+            if self.keep_running: self.rabbit = Rabbitmq()
+            self.rabbit.consume("montreal_trips", self.callback_trips)
+        except pika.exceptions.ChannelWrongStateError as e:
+            logging.info(f"Exiting. Pika Exception: {e}")
+        except OSError as e:
+            logging.info(f"Exiting. OSError: {e}")
+        except AttributeError as e:
+            logging.info(f"Exiting. AttributeError: {e}")
         self.rabbit.close()        

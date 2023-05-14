@@ -2,12 +2,14 @@ import logging
 import sys
 sys.path.append("..")
 from rabbitmq.rabbit import Rabbitmq
+import pika
 END = "E"
 
 class RainyDays :
     def __init__(self):
         self.rabbit = Rabbitmq()
         self.weathers = {}
+        self.keep_running = True
 
     def callback_trips(self, ch, method, properties, body):
         body = body.decode('utf-8')
@@ -42,10 +44,22 @@ class RainyDays :
             if len(cols) < 3: continue
             if float(cols[2]) > 30:
                 self.weathers[(cols[0],cols[1])] = cols[2]
+    
+    def stop(self):
+        self.rabbit.close()
+        self.keep_running = False
+        logging.info(f"Rainy Days Gracefully closing")
 
     def run(self):
-        self.rabbit.consume("rain_amount", self.callback_weather)
-        self.rabbit.close()        
-        self.rabbit = Rabbitmq()
-        self.rabbit.consume("trip_duration", self.callback_trips)
+        try:
+            self.rabbit.consume("rain_amount", self.callback_weather)
+            self.rabbit.close()        
+            if self.keep_running: self.rabbit = Rabbitmq()
+            self.rabbit.consume("trip_duration", self.callback_trips)
+        except pika.exceptions.ChannelWrongStateError as e:
+            logging.info(f"Exiting. Pika Exception: {e}")
+        except OSError as e:
+            logging.info(f"Exiting. OSError: {e}")
+        except AttributeError as e:
+            logging.info(f"Exiting. AttributeError: {e}")
         self.rabbit.close()        

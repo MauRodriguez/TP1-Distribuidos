@@ -14,7 +14,6 @@ class Client:
     def __init__(self, server_address):
         splited_info = server_address.split(":")
         self.socket = ConnectSocket((splited_info[0],int(splited_info[1])))
-        self.keep_running = True
         self.results = 0
     
     def run(self):
@@ -48,7 +47,6 @@ class Client:
         logging.info(f"action: close | result: success")
     
     def read_and_send(self, city, filename, type):
-        if self.keep_running == False: return
         path = f"data/{city}/{filename}.csv"
 
         with open(path,"r") as file:
@@ -82,5 +80,9 @@ class Client:
             if msg[-2] == END:
                 self.results += 1
             logging.info(f"RESULT: {msg}")
+
+    def stop(self):
+        self.socket.close()
+        logging.info(f"Client Gracefully closing client socket")
 
         

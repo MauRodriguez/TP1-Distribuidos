@@ -1,3 +1,5 @@
+import signal
+from functools import partial 
 import logging
 import os
 from configparser import ConfigParser
@@ -30,6 +32,11 @@ def main():
     initialize_log(config_params["logging_level"])
 
     year_filter = YearFilter()
+    signal.signal(signal.SIGTERM, partial(handle_sigterm, year_filter))
     year_filter.run()
 
+def handle_sigterm(year_filter, signum, frame):
+    year_filter.stop()
+    logging.info(f"Sigterm received with signum {signum} frame {frame}")
+    
 main()

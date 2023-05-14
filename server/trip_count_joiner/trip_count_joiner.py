@@ -2,6 +2,7 @@ import logging
 import sys
 sys.path.append("..")
 from rabbitmq.rabbit import Rabbitmq
+import pika
 END = "E"
 MAX_MSG_LENGHT = 8192
 QUERY = "Q2"
@@ -45,7 +46,18 @@ class TripCountJoiner:
             trips_17 = self.count[cols[0]][1]
 
             self.count[cols[0]] = [trips_16 + int(cols[1]), trips_17 + int(cols[2])]
+        
+    def stop(self):
+        self.rabbit.close()
+        logging.info(f"Trip Count Joiner Gracefully closing")
 
     def run(self):
-        self.rabbit.consume("trip_count", self.callback)
+        try:
+            self.rabbit.consume("trip_count", self.callback)
+        except pika.exceptions.ChannelWrongStateError as e:
+            logging.info(f"Exiting. Pika Exception: {e}")
+        except OSError as e:
+            logging.info(f"Exiting. OSError: {e}")
+        except AttributeError as e:
+            logging.info(f"Exiting. AttributeError: {e}")
         self.rabbit.close()      

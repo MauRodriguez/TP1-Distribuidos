@@ -1,3 +1,5 @@
+import signal
+from functools import partial 
 import logging
 import os
 from configparser import ConfigParser
@@ -30,6 +32,11 @@ def main():
     initialize_log(config_params["logging_level"])
 
     trip_count = TripCount()
+    signal.signal(signal.SIGTERM, partial(handle_sigterm, trip_count))
     trip_count.run()
+
+def handle_sigterm(trip_count, signum, frame):
+    trip_count.stop()
+    logging.info(f"Sigterm received with signum {signum} frame {frame}")
 
 main()

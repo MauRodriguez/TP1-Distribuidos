@@ -1,3 +1,5 @@
+import signal
+from functools import partial 
 import logging
 import os
 from configparser import ConfigParser
@@ -30,6 +32,11 @@ def main():
     initialize_log(config_params["logging_level"])
 
     rainy_days = RainyDays()
+    signal.signal(signal.SIGTERM, partial(handle_sigterm, rainy_days))
     rainy_days.run()
+
+def handle_sigterm(rainy_days, signum, frame):
+    rainy_days.stop()
+    logging.info(f"Sigterm received with signum {signum} frame {frame}")
 
 main()

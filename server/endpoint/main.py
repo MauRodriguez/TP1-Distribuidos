@@ -2,6 +2,8 @@ from server import Server
 from configparser import ConfigParser
 import os
 import logging
+import signal
+from functools import partial
 
 def initialize_config():
 
@@ -26,13 +28,17 @@ def initialize_log(logging_level):
         datefmt='%Y-%m-%d %H:%M:%S',
     )
 
-
 def main():
     config_params = initialize_config()
     logging_level = config_params["logging_level"]
     port = config_params["port"]
     initialize_log(logging_level)
     server = Server(port)
+    signal.signal(signal.SIGTERM, partial(handle_sigterm, server))
     server.run()
+
+def handle_sigterm(server, signum, frame):
+    server.stop()
+    logging.info(f"Sigterm received with signum {signum} frame {frame}")
 
 main()

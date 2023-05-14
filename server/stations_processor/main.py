@@ -1,3 +1,5 @@
+import signal
+from functools import partial 
 import logging
 import os
 from configparser import ConfigParser
@@ -29,7 +31,12 @@ def main():
     config_params = initialize_config()
     initialize_log(config_params["logging_level"])
 
-    stations_proccessor = StationsProcessor()
-    stations_proccessor.run()
+    stations_processor = StationsProcessor()
+    signal.signal(signal.SIGTERM, partial(handle_sigterm, stations_processor))
+    stations_processor.run()
+
+def handle_sigterm(stations_processor, signum, frame):
+    stations_processor.stop()
+    logging.info(f"Sigterm received with signum {signum} frame {frame}")
 
 main()

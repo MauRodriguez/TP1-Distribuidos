@@ -1,3 +1,5 @@
+import signal
+from functools import partial 
 import logging
 import os
 from configparser import ConfigParser
@@ -30,6 +32,11 @@ def main():
     initialize_log(config_params["logging_level"])
 
     duration_mean = DurationMean()
+    signal.signal(signal.SIGTERM, partial(handle_sigterm, duration_mean))    
     duration_mean.run()
+
+def handle_sigterm(duration_mean, signum, frame):
+    duration_mean.stop()
+    logging.info(f"Sigterm received with signum {signum} frame {frame}")
 
 main()

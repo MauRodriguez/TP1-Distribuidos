@@ -1,3 +1,5 @@
+import signal
+from functools import partial 
 import logging
 import os
 from configparser import ConfigParser
@@ -30,6 +32,11 @@ def main():
     initialize_log(config_params["logging_level"])
 
     harversine_distance = HaversineDistance()
+    signal.signal(signal.SIGTERM, partial(handle_sigterm, harversine_distance))
     harversine_distance.run()
+
+def handle_sigterm(harversine_distance, signum, frame):
+    harversine_distance.stop()
+    logging.info(f"Sigterm received with signum {signum} frame {frame}")
 
 main()
