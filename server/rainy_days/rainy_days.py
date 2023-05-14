@@ -6,17 +6,23 @@ import pika
 END = "E"
 
 class RainyDays :
-    def __init__(self):
+    def __init__(self, trip_processor_amount, weather_processor_amount):
         self.rabbit = Rabbitmq()
         self.weathers = {}
         self.keep_running = True
+        self.trip_processor_amount = trip_processor_amount
+        self.weather_processor_amount = weather_processor_amount
 
     def callback_trips(self, ch, method, properties, body):
         body = body.decode('utf-8')
         if body == END:
-            logging.info("End of trips filtereds received")            
-            self.rabbit.publish("","rainy_trips",body)
-            ch.close()
+            self.trip_processor_amount -= 1
+            if self.trip_processor_amount == 0:
+                logging.info("End of trips filtereds received")            
+                self.rabbit.publish("","rainy_trips",body)
+                ch.close()
+            return
+        
         rows = body.split(';')
         filter_data = ""
 
@@ -30,11 +36,12 @@ class RainyDays :
             self.rabbit.publish("","rainy_trips",filter_data)
 
     def callback_weather(self, ch, method, properties, body):
-        body = body.decode('utf-8')
-        
+        body = body.decode('utf-8')        
         if body == END:
-            logging.info("End of weathers filtereds received")
-            ch.close()
+            self.weather_processor_amount -= 1
+            if self.weather_processor_amount == 0:
+                logging.info("End of weathers filtereds received")
+                ch.close()
             return
     
         rows = body.split(';')

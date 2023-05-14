@@ -6,7 +6,9 @@ default: build
 all:
 
 docker-compose-up: 
-	docker compose -f docker-compose-dev.yaml up -d --build
+	docker compose -f docker-compose-dev.yaml up -d --build \
+	--scale trips_processor=3 --scale weather_processor=3 --scale stations_processor=3 \
+	--scale montreal_stations=3 --scale harversine_distance=3
 .PHONY: docker-compose-up
 
 docker-compose-down:

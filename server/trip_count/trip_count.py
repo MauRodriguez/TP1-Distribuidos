@@ -7,11 +7,12 @@ END = "E"
 MAX_MSG_LENGHT = 8192
 
 class TripCount :
-    def __init__(self):
+    def __init__(self, station_processor_amount):
         self.rabbit = Rabbitmq()
         self.stations = {}
         self.counts = {}
         self.keep_running = True
+        self.station_processor_amount = station_processor_amount
 
     def send_partial_count(self):
         response = ""
@@ -51,11 +52,12 @@ class TripCount :
                 self.counts[self.stations[cols[1]]][1] = trips_17 + 1
 
     def callback_stations(self, ch, method, properties, body):
-        body = body.decode('utf-8')
-        
+        body = body.decode('utf-8')        
         if body == END:
-            logging.info("End of stations code name received")
-            ch.close()
+            self.station_processor_amount -= 1
+            if self.station_processor_amount == 0:
+                logging.info("End of stations code name received")
+                ch.close()
             return
     
         rows = body.split(';')

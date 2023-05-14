@@ -8,15 +8,18 @@ YEAR1 = "2016"
 YEAR2 = "2017"
 
 class YearFilter:
-    def __init__(self):
-        self.rabbit = Rabbitmq()  
+    def __init__(self, trip_processor_amount):
+        self.rabbit = Rabbitmq() 
+        self.trip_processor_amount = trip_processor_amount
 
     def callback(self, ch, method, properties, body):
         body = body.decode('utf-8')        
         if body == END:
-            logging.info("End of 16-17 trips received")
-            self.rabbit.publish("","16_17_trips", body)
-            ch.close()
+            self.trip_processor_amount -= 1
+            if self.trip_processor_amount == 0:
+                logging.info("End of 16-17 trips received")
+                self.rabbit.publish("","16_17_trips", body)
+                ch.close()
             return
     
         rows = body.split(';')

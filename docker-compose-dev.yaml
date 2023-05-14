@@ -4,7 +4,6 @@ services:
     server:
         volumes:
             - ./server/config.ini:/config.ini
-        container_name: server
         build: 
             context: ./server
             dockerfile: ./endpoint/Dockerfile
@@ -14,12 +13,14 @@ services:
                 condition: service_healthy
         environment:
             - LOGGING_LEVEL=INFO  
+            - TRIP_PROCESSOR_AMOUNT=3
+            - WEATHER_PROCESSOR_AMOUNT=3
+            - STATION_PROCESSOR_AMOUNT=3
         networks:
             - client-server
             - rabbitmq-net
 
     client:
-        container_name: client
         volumes:
             - ./client/config.ini:/config.ini
         build: ./client
@@ -32,7 +33,6 @@ services:
             - server
     
     weather_processor:
-        container_name: 'weather_processor'
         build: 
             context: ./server
             dockerfile: ./weather_processor/Dockerfile
@@ -46,7 +46,6 @@ services:
             - LOGGING_LEVEL=DEBUG
             
     trips_processor:
-        container_name: 'trips_processor'
         build: 
             context: ./server
             dockerfile: ./trips_processor/Dockerfile
@@ -60,7 +59,6 @@ services:
             - LOGGING_LEVEL=DEBUG
         
     montreal_stations:
-        container_name: 'montreal_stations'
         build: 
             context: ./server
             dockerfile: ./montreal_stations/Dockerfile
@@ -72,9 +70,10 @@ services:
                 condition: service_healthy
         environment:
             - LOGGING_LEVEL=DEBUG
+            - STATION_PROCESSOR_AMOUNT=3
+            - HARVERSINE_DISTANCE_AMOUNT=3
         
     montreal_trips:
-        container_name: 'montreal_trips'
         build: 
             context: ./server
             dockerfile: ./montreal_trips/Dockerfile
@@ -86,9 +85,10 @@ services:
                 condition: service_healthy
         environment:
             - LOGGING_LEVEL=DEBUG
+            - TRIP_PROCESSOR_AMOUNT=3
+            - HARVERSINE_DISTANCE_AMOUNT=3
 
     year_filter:
-        container_name: 'year_filter'
         build: 
             context: ./server
             dockerfile: ./year_filter/Dockerfile
@@ -100,9 +100,9 @@ services:
                 condition: service_healthy
         environment:
             - LOGGING_LEVEL=DEBUG
+            - TRIP_PROCESSOR_AMOUNT=3
 
     stations_processor:
-        container_name: 'stations_processor'
         build: 
             context: ./server
             dockerfile: ./stations_processor/Dockerfile
@@ -114,9 +114,9 @@ services:
                 condition: service_healthy
         environment:
             - LOGGING_LEVEL=DEBUG 
+            - MONTREAL_STATION_AMOUNT=3
 
     rainy_days:
-        container_name: 'rainy_days'
         build: 
             context: ./server
             dockerfile: ./rainy_days/Dockerfile
@@ -128,9 +128,10 @@ services:
                 condition: service_healthy
         environment:
             - LOGGING_LEVEL=DEBUG
+            - TRIP_PROCESSOR_AMOUNT=3
+            - WEATHER_PROCESSOR_AMOUNT=3
     
     trip_count:
-        container_name: 'trip_count'
         build: 
             context: ./server
             dockerfile: ./trip_count/Dockerfile
@@ -142,9 +143,9 @@ services:
                 condition: service_healthy
         environment:
             - LOGGING_LEVEL=DEBUG
+            - STATION_PROCESSOR_AMOUNT=3
     
     trip_count_joiner:
-        container_name: 'trip_count_joiner'
         build: 
             context: ./server
             dockerfile: ./trip_count_joiner/Dockerfile
@@ -158,7 +159,6 @@ services:
             - LOGGING_LEVEL=DEBUG
     
     harversine_distance:
-        container_name: 'harversine_distance'
         build: 
             context: ./server
             dockerfile: ./harversine_distance/Dockerfile
@@ -170,9 +170,9 @@ services:
                 condition: service_healthy
         environment:
             - LOGGING_LEVEL=DEBUG
+            - MONTREAL_STATION_AMOUNT=3            
 
     duration_mean:
-        container_name: 'duration_mean'
         build: 
             context: ./server
             dockerfile: ./duration_mean/Dockerfile
@@ -186,7 +186,6 @@ services:
             - LOGGING_LEVEL=DEBUG    
     
     distance_mean:
-        container_name: 'distance_mean'
         build: 
             context: ./server
             dockerfile: ./distance_mean/Dockerfile
@@ -198,9 +197,9 @@ services:
                 condition: service_healthy
         environment:
             - LOGGING_LEVEL=DEBUG
+            - HARVERSINE_DISTANCE_AMOUNT=3
 
     distance_mean_joiner:
-        container_name: 'distance_mean_joiner'
         build: 
             context: ./server
             dockerfile: ./distance_mean_joiner/Dockerfile
@@ -214,7 +213,6 @@ services:
             - LOGGING_LEVEL=DEBUG
 
     duration_mean_joiner:
-        container_name: 'duration_mean_joiner'
         build: 
             context: ./server
             dockerfile: ./duration_mean_joiner/Dockerfile
@@ -228,7 +226,6 @@ services:
             - LOGGING_LEVEL=DEBUG 
 
     rabbitmq:
-        container_name: 'rabbitmq'
         image: rabbitmq:3.9.16-management-alpine
         networks:
             - rabbitmq-net

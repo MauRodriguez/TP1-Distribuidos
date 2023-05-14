@@ -7,11 +7,12 @@ from haversine import haversine
 END = "E"
 
 class HaversineDistance :
-    def __init__(self):
+    def __init__(self, montreal_station_amount):
         self.rabbit = Rabbitmq()
         self.stations = {}
         self.distances = {}
         self.keep_running = True
+        self.montreal_station_amount = montreal_station_amount
 
     def callback_trips(self, ch, method, properties, body):
         body = body.decode('utf-8')
@@ -42,8 +43,10 @@ class HaversineDistance :
     def callback_stations(self, ch, method, properties, body):
         body = body.decode('utf-8')
         if body == END:
-            logging.info("End of montreal stations received")
-            ch.close()
+            self.montreal_station_amount -= 1
+            if self.montreal_station_amount == 0:
+                logging.info("End of montreal stations received")
+                ch.close()
             return
     
         rows = body.split(';')

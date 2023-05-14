@@ -14,6 +14,9 @@ def initialize_config():
     try:
         config_params["port"] = int(os.getenv('SERVER_PORT', config["DEFAULT"]["SERVER_PORT"]))
         config_params["logging_level"] = os.getenv('LOGGING_LEVEL', config["DEFAULT"]["LOGGING_LEVEL"])
+        config_params["trip_processor_amount"] = os.getenv('TRIP_PROCESSOR_AMOUNT', config["DEFAULT"]["TRIP_PROCESSOR_AMOUNT"])
+        config_params["weather_processor_amount"] = os.getenv('WEATHER_PROCESSOR_AMOUNT', config["DEFAULT"]["WEATHER_PROCESSOR_AMOUNT"])
+        config_params["station_processor_amount"] = os.getenv('STATION_PROCESSOR_AMOUNT', config["DEFAULT"]["STATION_PROCESSOR_AMOUNT"])
     except KeyError as e:
         raise KeyError("Key was not found. Error: {} .Aborting server".format(e))
     except ValueError as e:
@@ -31,9 +34,11 @@ def initialize_log(logging_level):
 def main():
     config_params = initialize_config()
     logging_level = config_params["logging_level"]
-    port = config_params["port"]
+    port = config_params["port"]    
     initialize_log(logging_level)
-    server = Server(port)
+    server = Server(port, int(config_params["trip_processor_amount"]),
+                    int(config_params["weather_processor_amount"]),
+                    int(config_params["station_processor_amount"]))
     signal.signal(signal.SIGTERM, partial(handle_sigterm, server))
     server.run()
 

@@ -13,6 +13,7 @@ def initialize_config():
     config_params = {}
     try:        
         config_params["logging_level"] = os.getenv('LOGGING_LEVEL', config["DEFAULT"]["LOGGING_LEVEL"])
+        config_params["montreal_station_amount"] = os.getenv('MONTREAL_STATION_AMOUNT', config["DEFAULT"]["MONTREAL_STATION_AMOUNT"])
     except KeyError as e:
         raise KeyError("Key was not found. Error: {} .Aborting server".format(e))
     except ValueError as e:
@@ -31,7 +32,7 @@ def main():
     config_params = initialize_config()
     initialize_log(config_params["logging_level"])
 
-    stations_processor = StationsProcessor()
+    stations_processor = StationsProcessor(int(config_params["montreal_station_amount"]))
     signal.signal(signal.SIGTERM, partial(handle_sigterm, stations_processor))
     stations_processor.run()
 

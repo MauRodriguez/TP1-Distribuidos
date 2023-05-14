@@ -7,16 +7,19 @@ END = "E"
 MONTREAL = "m"
 
 class MontrealTrips:
-    def __init__(self):
+    def __init__(self, trip_processor_amount, harversine_distance_amount):
         self.rabbit = Rabbitmq()  
-
+        self.trip_processor_amount = trip_processor_amount
+        self.harversine_distance_amount = harversine_distance_amount
     def callback(self, ch, method, properties, body):
-        body = body.decode('utf-8')
-        
+        body = body.decode('utf-8')        
         if body == END:
-            logging.info("End of start-end trip received")
-            self.rabbit.publish("","montreal_trips", body)
-            ch.close()
+            self.trip_processor_amount -= 1 
+            if self.trip_processor_amount == 0:
+                for i in range(0, self.harversine_distance_amount):
+                    self.rabbit.publish("","montreal_trips", body)
+                logging.info("End of start-end trip received")
+                ch.close()
             return
     
         rows = body.split(';')

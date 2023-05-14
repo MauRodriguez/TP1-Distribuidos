@@ -6,14 +6,16 @@ import pika
 END = "E"
 
 class StationsProcessor :
-    def __init__(self):
+    def __init__(self, montreal_station_amount):
         self.rabbit = Rabbitmq()
+        self.montreal_station_amount = montreal_station_amount
 
     def callback(self, ch, method, properties, body):
         body = body.decode('utf-8')
         if body == END:
             logging.info("End of stations received")
-            self.rabbit.publish("","station_location", body)
+            for i in range(0, self.montreal_station_amount):
+                self.rabbit.publish("","station_location", body)
             self.rabbit.publish("","stations_code_name", body) 
             ch.close()
             return

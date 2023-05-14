@@ -13,6 +13,8 @@ def initialize_config():
     config_params = {}
     try:        
         config_params["logging_level"] = os.getenv('LOGGING_LEVEL', config["DEFAULT"]["LOGGING_LEVEL"])
+        config_params["station_processor_amount"] = os.getenv('STATION_PROCESSOR_AMOUNT', config["DEFAULT"]["STATION_PROCESSOR_AMOUNT"])
+        config_params["harversine_distance_amount"] = os.getenv('HARVERSINE_DISTANCE_AMOUNT', config["DEFAULT"]["HARVERSINE_DISTANCE_AMOUNT"])
     except KeyError as e:
         raise KeyError("Key was not found. Error: {} .Aborting server".format(e))
     except ValueError as e:
@@ -31,7 +33,8 @@ def main():
     config_params = initialize_config()
     initialize_log(config_params["logging_level"])
 
-    montreal_stations = MontrealStations()
+    montreal_stations = MontrealStations(int(config_params["station_processor_amount"]),
+                                         int(config_params["harversine_distance_amount"]))
     signal.signal(signal.SIGTERM, partial(handle_sigterm, montreal_stations))
     montreal_stations.run()
 

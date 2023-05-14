@@ -13,13 +13,17 @@ END = "E"
 RESULT = "R"
 
 class Server:
-    def __init__(self, port):
+    def __init__(self, port, trip_processor_amount, weather_processor_amount,
+                 station_processor_amount):
         self.socket_listener = ListenSocket('', port, 1)
         self.socket_listener.bind_and_listen()
         self.keep_receiving = True
         self.client_socket = None
         self.rabbit = Rabbitmq()
         self.queries_finished = 0
+        self.trip_processor_amount = trip_processor_amount
+        self.weather_processor_amount = weather_processor_amount
+        self.station_processor_amount = station_processor_amount
     
     def run(self):
         try:
@@ -76,11 +80,24 @@ class Server:
 
             if type == WEATHER:
                 routing_key = "weather"
-            if type == STATION:
+                if msg == END:
+                    for i in range(0, self.weather_processor_amount):
+                        self.rabbit.publish(exchange="dispatcher", routing_key=routing_key, msg=msg)
+                        continue
+
+            elif type == STATION:
                 routing_key = "stations"
-            if type == TRIP:
+                for i in range(0, self.station_processor_amount):
+                        self.rabbit.publish(exchange="dispatcher", routing_key=routing_key, msg=msg)
+                        continue
+
+            elif type == TRIP:
                 routing_key = "trips"
                 if msg == END:
-                    self.keep_receiving = False          
+                    self.keep_receiving = False
+                    for i in range(0, self.trip_processor_amount):
+                        self.rabbit.publish(exchange="dispatcher", routing_key=routing_key, msg=msg)
+                        continue
+                      
             
             self.rabbit.publish(exchange="dispatcher", routing_key=routing_key, msg=msg)

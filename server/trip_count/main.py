@@ -13,6 +13,7 @@ def initialize_config():
     config_params = {}
     try:        
         config_params["logging_level"] = os.getenv('LOGGING_LEVEL', config["DEFAULT"]["LOGGING_LEVEL"])
+        config_params["station_processor_amount"] = os.getenv("STATION_PROCESSOR_AMOUNT",config["DEFAULT"]["STATION_PROCESSOR_AMOUNT"])
     except KeyError as e:
         raise KeyError("Key was not found. Error: {} .Aborting server".format(e))
     except ValueError as e:
@@ -31,7 +32,7 @@ def main():
     config_params = initialize_config()
     initialize_log(config_params["logging_level"])
 
-    trip_count = TripCount()
+    trip_count = TripCount(int(config_params["station_processor_amount"]))
     signal.signal(signal.SIGTERM, partial(handle_sigterm, trip_count))
     trip_count.run()
 
