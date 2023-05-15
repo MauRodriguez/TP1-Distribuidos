@@ -33,8 +33,8 @@ class Client:
             self.send_msg(STATION, END.encode("utf-8"))
 
             self.read_and_send("montreal", "trips", TRIP)
-            #self.read_and_send("toronto", "trips", TRIP)
-            #self.read_and_send("washington", "trips", TRIP)  
+            self.read_and_send("toronto", "trips", TRIP)
+            self.read_and_send("washington", "trips", TRIP)  
             self.send_msg(TRIP, END.encode("utf-8"))      
             logging.info(f"action: end of sending trips")
 
@@ -55,8 +55,8 @@ class Client:
 
             batch = "".encode('utf-8')
             for i, line in enumerate(reader):
-                if i % 100 > 5 and type == TRIP:
-                    continue            
+                # if i % 100 > 5 and type == TRIP:
+                #     continue            
                 data = city[0] + "," + (','.join(line)) + ";"
                 data_encoded = data.encode("utf-8")
 

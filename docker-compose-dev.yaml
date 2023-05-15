@@ -57,6 +57,7 @@ services:
                 condition: service_healthy
         environment:
             - LOGGING_LEVEL=DEBUG
+            - MONTREAL_TRIPS_AMOUNT=3
         
     montreal_stations:
         build: 
@@ -170,7 +171,8 @@ services:
                 condition: service_healthy
         environment:
             - LOGGING_LEVEL=DEBUG
-            - MONTREAL_STATION_AMOUNT=3            
+            - MONTREAL_STATION_AMOUNT=3
+            - MONTREAL_TRIPS_AMOUNT=3    
 
     duration_mean:
         build: 

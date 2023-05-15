@@ -7,19 +7,22 @@ from haversine import haversine
 END = "E"
 
 class HaversineDistance :
-    def __init__(self, montreal_station_amount):
+    def __init__(self, montreal_station_amount, montreal_trips_amount):
         self.rabbit = Rabbitmq()
         self.stations = {}
         self.distances = {}
         self.keep_running = True
         self.montreal_station_amount = montreal_station_amount
+        self.montreal_trips_amount = montreal_trips_amount
 
     def callback_trips(self, ch, method, properties, body):
         body = body.decode('utf-8')
         if body == END:
-            logging.info("End of montreal trips received")
-            self.rabbit.publish("","distances", body)
-            ch.close()
+            self.montreal_trips_amount -= 1
+            if self.montreal_trips_amount == 0:
+                logging.info("End of montreal trips received")
+                self.rabbit.publish("","distances", body)
+                ch.close()
         
         rows = body.split(';')
         result = ""
@@ -65,7 +68,8 @@ class HaversineDistance :
         try:
             self.rabbit.consume("montreal_stations", self.callback_stations)
             self.rabbit.close()        
-            if self.keep_running: self.rabbit = Rabbitmq()
+            if self.keep_running: 
+                self.rabbit = Rabbitmq()            
             self.rabbit.consume("montreal_trips", self.callback_trips)
         except pika.exceptions.ChannelWrongStateError as e:
             logging.info(f"Exiting. Pika Exception: {e}")

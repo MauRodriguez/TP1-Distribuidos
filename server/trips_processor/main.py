@@ -12,6 +12,7 @@ def initialize_config():
 
     config_params = {}
     try:        
+        config_params["montreal_trips_amount"] = os.getenv('MONTREAL_TRIPS_AMOUNT', config["DEFAULT"]["MONTREAL_TRIPS_AMOUNT"])
         config_params["logging_level"] = os.getenv('LOGGING_LEVEL', config["DEFAULT"]["LOGGING_LEVEL"])
     except KeyError as e:
         raise KeyError("Key was not found. Error: {} .Aborting server".format(e))
@@ -31,7 +32,7 @@ def main():
     config_params = initialize_config()
     initialize_log(config_params["logging_level"])
 
-    trips_proccessor = TripsProcessor()
+    trips_proccessor = TripsProcessor(int(config_params["montreal_trips_amount"]))
     signal.signal(signal.SIGTERM, partial(handle_sigterm, trips_proccessor))
     trips_proccessor.run()
 

@@ -6,15 +6,17 @@ import pika
 END = "E"
 
 class TripsProcessor :
-    def __init__(self):
+    def __init__(self, montreal_trips_amount):
         self.rabbit = Rabbitmq()
+        self.montreal_trips_amount = montreal_trips_amount
 
     def callback(self, ch, method, properties, body):        
         body = body.decode('utf-8')
         if body == END:
             logging.info("End of trips received")
             self.rabbit.publish("","trip_duration", body) 
-            self.rabbit.publish("","start_end_code_trip", body)
+            for i in range(0, self.montreal_trips_amount):            
+                self.rabbit.publish("","start_end_code_trip", body)
             self.rabbit.publish("","year_and_start_station",body)            
             ch.close()
             return

@@ -76,7 +76,8 @@ class TripCount :
         try:
             self.rabbit.consume("stations_code_name", self.callback_stations)
             self.rabbit.close()        
-            if self.keep_running: self.rabbit = Rabbitmq()
+            if self.keep_running: 
+                self.rabbit = Rabbitmq()
             self.rabbit.consume("16_17_trips", self.callback_trips)
         except pika.exceptions.ChannelWrongStateError as e:
             logging.info(f"Exiting. Pika Exception: {e}")

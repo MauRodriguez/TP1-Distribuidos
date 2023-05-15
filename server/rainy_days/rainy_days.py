@@ -61,7 +61,8 @@ class RainyDays :
         try:
             self.rabbit.consume("rain_amount", self.callback_weather)
             self.rabbit.close()        
-            if self.keep_running: self.rabbit = Rabbitmq()
+            if self.keep_running: 
+                self.rabbit = Rabbitmq()
             self.rabbit.consume("trip_duration", self.callback_trips)
         except pika.exceptions.ChannelWrongStateError as e:
             logging.info(f"Exiting. Pika Exception: {e}")

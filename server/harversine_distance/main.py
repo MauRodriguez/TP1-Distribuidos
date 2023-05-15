@@ -14,6 +14,7 @@ def initialize_config():
     try:        
         config_params["logging_level"] = os.getenv('LOGGING_LEVEL', config["DEFAULT"]["LOGGING_LEVEL"])
         config_params["montreal_station_amount"] = os.getenv('MONTREAL_STATION_AMOUNT', config["DEFAULT"]["MONTREAL_STATION_AMOUNT"])
+        config_params["montreal_trips_amount"] = os.getenv('MONTREAL_TRIPS_AMOUNT', config["DEFAULT"]["MONTREAL_TRIPS_AMOUNT"])
     except KeyError as e:
         raise KeyError("Key was not found. Error: {} .Aborting server".format(e))
     except ValueError as e:
@@ -32,7 +33,8 @@ def main():
     config_params = initialize_config()
     initialize_log(config_params["logging_level"])
 
-    harversine_distance = HaversineDistance(int(config_params["montreal_station_amount"]))
+    harversine_distance = HaversineDistance(int(config_params["montreal_station_amount"]),
+                                            int(config_params["montreal_trips_amount"]))
     signal.signal(signal.SIGTERM, partial(handle_sigterm, harversine_distance))
     harversine_distance.run()
 

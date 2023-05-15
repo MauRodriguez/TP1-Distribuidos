@@ -82,22 +82,27 @@ class Server:
                 routing_key = "weather"
                 if msg == END:
                     for i in range(0, self.weather_processor_amount):
+                        logging.info("Mando Eof de weather")
                         self.rabbit.publish(exchange="dispatcher", routing_key=routing_key, msg=msg)
-                        continue
+                    continue
 
             elif type == STATION:
                 routing_key = "stations"
-                for i in range(0, self.station_processor_amount):
+                if msg == END:
+                    for i in range(0, self.station_processor_amount):
+                        logging.info("Mando Eof de stations")
                         self.rabbit.publish(exchange="dispatcher", routing_key=routing_key, msg=msg)
-                        continue
+                    continue
+
 
             elif type == TRIP:
                 routing_key = "trips"
                 if msg == END:
                     self.keep_receiving = False
                     for i in range(0, self.trip_processor_amount):
+                        logging.info("Mando Eof de trips")
                         self.rabbit.publish(exchange="dispatcher", routing_key=routing_key, msg=msg)
-                        continue
+                    continue
                       
             
             self.rabbit.publish(exchange="dispatcher", routing_key=routing_key, msg=msg)
