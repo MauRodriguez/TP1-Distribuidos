@@ -15,6 +15,7 @@ def initialize_config():
         config_params["logging_level"] = os.getenv('LOGGING_LEVEL', config["DEFAULT"]["LOGGING_LEVEL"])
         config_params["trip_processor_amount"] = os.getenv('TRIP_PROCESSOR_AMOUNT', config["DEFAULT"]["TRIP_PROCESSOR_AMOUNT"])
         config_params["weather_processor_amount"] = os.getenv('WEATHER_PROCESSOR_AMOUNT', config["DEFAULT"]["WEATHER_PROCESSOR_AMOUNT"])
+        config_params["duration_mean_amount"] = os.getenv("DURATION_MEAN_AMOUNT", config["DEFAULT"]["DURATION_MEAN_AMOUNT"])
     except KeyError as e:
         raise KeyError("Key was not found. Error: {} .Aborting server".format(e))
     except ValueError as e:
@@ -34,7 +35,8 @@ def main():
     initialize_log(config_params["logging_level"])
 
     rainy_days = RainyDays(int(config_params["trip_processor_amount"]),
-                           int(config_params["weather_processor_amount"]))
+                           int(config_params["weather_processor_amount"]),
+                           int(config_params["duration_mean_amount"]))
     signal.signal(signal.SIGTERM, partial(handle_sigterm, rainy_days))
     rainy_days.run()
 

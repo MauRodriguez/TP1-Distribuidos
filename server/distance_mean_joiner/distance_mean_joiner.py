@@ -8,9 +8,10 @@ MAX_MSG_LENGHT = 8192
 QUERY = "Q3"
 
 class DistanceMeanJoiner:
-    def __init__(self):
+    def __init__(self, distance_mean_amount):
         self.rabbit = Rabbitmq()
         self.distances = {}    
+        self.distance_mean_amount = distance_mean_amount
 
     def calculate_mean_distance(self):
         response = f"{QUERY};"
@@ -32,9 +33,11 @@ class DistanceMeanJoiner:
     def callback(self, ch, method, properties, body):
         body = body.decode('utf-8')
         if body == END:
-            logging.info("End of distance mean received")
-            self.calculate_mean_distance()
-            ch.close()
+            self.distance_mean_amount -= 1
+            if self.distance_mean_amount == 0:
+                logging.info("End of distance mean received")
+                self.calculate_mean_distance()
+                ch.close()
             return
     
         rows = body.split(';')

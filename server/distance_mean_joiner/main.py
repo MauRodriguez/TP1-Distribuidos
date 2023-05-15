@@ -13,6 +13,7 @@ def initialize_config():
     config_params = {}
     try:        
         config_params["logging_level"] = os.getenv('LOGGING_LEVEL', config["DEFAULT"]["LOGGING_LEVEL"])
+        config_params["distance_mean_amount"] = os.getenv("DISTANCE_MEAN_AMOUNT", config["DEFAULT"]["DISTANCE_MEAN_AMOUNT"])
     except KeyError as e:
         raise KeyError("Key was not found. Error: {} .Aborting server".format(e))
     except ValueError as e:
@@ -31,7 +32,7 @@ def main():
     config_params = initialize_config()
     initialize_log(config_params["logging_level"])
 
-    distance_mean_joiner = DistanceMeanJoiner()
+    distance_mean_joiner = DistanceMeanJoiner(int(config_params["distance_mean_amount"]))
     signal.signal(signal.SIGTERM, partial(handle_sigterm, distance_mean_joiner))
     distance_mean_joiner.run()
 

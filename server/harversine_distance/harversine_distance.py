@@ -7,21 +7,23 @@ from haversine import haversine
 END = "E"
 
 class HaversineDistance :
-    def __init__(self, montreal_station_amount, montreal_trips_amount):
+    def __init__(self, montreal_station_amount, montreal_trips_amount, distance_mean_amount):
         self.rabbit = Rabbitmq()
         self.stations = {}
         self.distances = {}
         self.keep_running = True
         self.montreal_station_amount = montreal_station_amount
         self.montreal_trips_amount = montreal_trips_amount
+        self.distance_mean_amount = distance_mean_amount
 
     def callback_trips(self, ch, method, properties, body):
         body = body.decode('utf-8')
         if body == END:
-            self.montreal_trips_amount -= 1
+            self.montreal_trips_amount -= 1            
             if self.montreal_trips_amount == 0:
                 logging.info("End of montreal trips received")
-                self.rabbit.publish("","distances", body)
+                for i in range(0, self.distance_mean_amount):                    
+                    self.rabbit.publish("","distances", body)
                 ch.close()
         
         rows = body.split(';')
@@ -47,6 +49,7 @@ class HaversineDistance :
         body = body.decode('utf-8')
         if body == END:
             self.montreal_station_amount -= 1
+            logging.info("recibo un end")
             if self.montreal_station_amount == 0:
                 logging.info("End of montreal stations received")
                 ch.close()

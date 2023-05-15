@@ -8,9 +8,10 @@ MAX_MSG_LENGHT = 8192
 QUERY = "Q1"
 
 class DurationMeanJoiner:
-    def __init__(self):
+    def __init__(self, duration_mean_amount):
         self.rabbit = Rabbitmq()
-        self.duration = {}    
+        self.duration = {}  
+        self.duration_mean_amount = duration_mean_amount  
 
     def calculate_mean_duration(self):
         response = f"{QUERY};"
@@ -31,9 +32,11 @@ class DurationMeanJoiner:
     def callback(self, ch, method, properties, body):
         body = body.decode('utf-8')
         if body == END:
-            logging.info("End of distance mean received")
-            self.calculate_mean_duration()
-            ch.close()
+            self.duration_mean_amount -= 1
+            if self.duration_mean_amount == 0:
+                logging.info("End of distance mean received")
+                self.calculate_mean_duration()
+                ch.close()
             return
     
         rows = body.split(';')

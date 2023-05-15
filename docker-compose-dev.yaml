@@ -58,6 +58,7 @@ services:
         environment:
             - LOGGING_LEVEL=DEBUG
             - MONTREAL_TRIPS_AMOUNT=3
+            - YEAR_FILTER_AMOUNT=3            
         
     montreal_stations:
         build: 
@@ -101,7 +102,7 @@ services:
                 condition: service_healthy
         environment:
             - LOGGING_LEVEL=DEBUG
-            - TRIP_PROCESSOR_AMOUNT=3
+            - TRIP_PROCESSOR_AMOUNT=3     
 
     stations_processor:
         build: 
@@ -116,7 +117,6 @@ services:
         environment:
             - LOGGING_LEVEL=DEBUG 
             - MONTREAL_STATION_AMOUNT=3
-
     rainy_days:
         build: 
             context: ./server
@@ -131,6 +131,7 @@ services:
             - LOGGING_LEVEL=DEBUG
             - TRIP_PROCESSOR_AMOUNT=3
             - WEATHER_PROCESSOR_AMOUNT=3
+            - DURATION_MEAN_AMOUNT=3  
     
     trip_count:
         build: 
@@ -145,6 +146,7 @@ services:
         environment:
             - LOGGING_LEVEL=DEBUG
             - STATION_PROCESSOR_AMOUNT=3
+            - YEAR_FILTER_AMOUNT=3
     
     trip_count_joiner:
         build: 
@@ -172,7 +174,8 @@ services:
         environment:
             - LOGGING_LEVEL=DEBUG
             - MONTREAL_STATION_AMOUNT=3
-            - MONTREAL_TRIPS_AMOUNT=3    
+            - MONTREAL_TRIPS_AMOUNT=3  
+            - DISTANCE_MEAN_AMOUNT=3  
 
     duration_mean:
         build: 
@@ -185,7 +188,7 @@ services:
             rabbitmq:
                 condition: service_healthy
         environment:
-            - LOGGING_LEVEL=DEBUG    
+            - LOGGING_LEVEL=DEBUG              
     
     distance_mean:
         build: 
@@ -199,7 +202,7 @@ services:
                 condition: service_healthy
         environment:
             - LOGGING_LEVEL=DEBUG
-            - HARVERSINE_DISTANCE_AMOUNT=3
+            - HARVERSINE_DISTANCE_AMOUNT=3            
 
     distance_mean_joiner:
         build: 
@@ -213,6 +216,7 @@ services:
                 condition: service_healthy
         environment:
             - LOGGING_LEVEL=DEBUG
+            - DISTANCE_MEAN_AMOUNT=3
 
     duration_mean_joiner:
         build: 
@@ -226,6 +230,7 @@ services:
                 condition: service_healthy
         environment:
             - LOGGING_LEVEL=DEBUG 
+            - DURATION_MEAN_AMOUNT=3  
 
     rabbitmq:
         image: rabbitmq:3.9.16-management-alpine

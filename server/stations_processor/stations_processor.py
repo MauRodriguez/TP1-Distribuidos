@@ -15,6 +15,7 @@ class StationsProcessor :
         if body == END:
             logging.info("End of stations received")
             for i in range(0, self.montreal_station_amount):
+                logging.info("mando end" + body)
                 self.rabbit.publish("","station_location", body)
             self.rabbit.publish("","stations_code_name", body) 
             ch.close()
