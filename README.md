@@ -8,6 +8,20 @@
 
 ---
 
+## Guía uso
+
+Para correr el compose se usa el comando 
+
+```sudo make docker-compose-up```
+
+Para ver los logs el comando
+
+```sudo make docker-compose-logs```
+
+Para detener el programa
+
+```sudo make docker-compose-down```
+
 ## Introducción
 En el presente trabajo práctico se trabaja sobre un dataset de los registros de viajes
 realizados con bicicletas de la red pública provista por grandes ciudades (washington, montreal y toronto).
