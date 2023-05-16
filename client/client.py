@@ -55,8 +55,8 @@ class Client:
 
             batch = "".encode('utf-8')
             for i, line in enumerate(reader):
-                # if i % 100 > 5 and type == TRIP:
-                #     continue            
+                # if i % 100 > 20 and type == TRIP:
+                #     continue        
                 data = city[0] + "," + (','.join(line)) + ";"
                 data_encoded = data.encode("utf-8")
 
