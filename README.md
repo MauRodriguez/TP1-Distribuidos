@@ -37,7 +37,7 @@ y se le devuelve al cliente en modo de respuesta.
 !["Diagrama DAG"](./diagrams/DAG.jpg)
 *Diagrama DAG*
 
-### Workerks
+### Workers
 
 - **Weather processor**: toma los datos de tipo clima y los pasa a Rainy Days para que los filtre.
 - **Rainy days**: recibe los datos del clima y los filtra dependiendo la cantidad de lluvia ese día (se queda con los > a 30mm). Una vez que termina de recibir todos los clima, comienza a recibir los trips y pasa a Duration Mean los trips de días lluviosos
