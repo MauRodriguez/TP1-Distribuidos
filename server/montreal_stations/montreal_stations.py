@@ -16,6 +16,7 @@ class MontrealStations:
         body = body.decode('utf-8')        
         if body == END:
             self.station_processor_amount -= 1
+            logging.info("recibo end en montreal stations")
             if self.station_processor_amount == 0:
                 for i in range(0, self.harversine_distance_amount):
                     self.rabbit.publish("","montreal_stations",body)
