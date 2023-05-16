@@ -30,12 +30,26 @@ los ciclistas recorren más de 6km en llegar a ellas.
 En principio, el sistema toma las entradas recibidas desde el cliente y pasa
 a procesarlas en un sistema de pipeline de tipo `worker per filter`.
 Divide dependiendo de si pertenece a una entrada de tipo `station`, `weather` o `trip`, luego
-cada una de estas va pasando por distintos filter realizando diferentes operaciones.
+cada una de estas va pasando por distintos filter realizando diferentes operaciones. Esto permite que el sistema comience su funcionamiento desde el instante cero sin tener que esperar a que se reciban, por ejemplo, primero todos los weathers. Además este tipo de separación de los workers por tipo de mensaje, permite en un futuro agregar otro tipo de mensaje y la reutilización de alguno de los workers ya existente sin tener que modificar mayormente la arquitectura a la hora de, por ejemplo, agregar otra query.
 Al final de los filtros `duration_mean` , `distance_mean` y `trip_count` resulta la
 información necesaria para dar el resultado de cada una de la queries. Esta información se recolecta
 y se le devuelve al cliente en modo de respuesta.
 !["Diagrama DAG"](./diagrams/DAG.jpg)
 *Diagrama DAG*
+
+### Workerks
+
+- **Weather processor**: toma los datos de tipo clima y los pasa a Rainy Days para que los filtre.
+- **Rainy days**: recibe los datos del clima y los filtra dependiendo la cantidad de lluvia ese día (se queda con los > a 30mm). Una vez que termina de recibir todos los clima, comienza a recibir los trips y pasa a Duration Mean los trips de días lluviosos
+- **Duration Mean**: calcula el promedio de duración de los viajes por cada día lluvioso.
+- **Trips processor**: toma los datos de viajes, y los reenvia hacía Rainy Days, Year Filter, y Montreal Trips mandandole a cada uno de estos la data especifica que necesitan.
+- **Year filter**: filtra los trips solo de 2016 y 2017 y los pasa a Trip count.
+- **Trip count**:  al finalizar de recibir todos los nombres de stations, cuenta la cantidad de viajes por estaciones-año. Cuando termina de recibir todas los trips, filtra los que hayan duplicado cantidad de viajes de un año al otro.
+- **Montreal trips**: filtra los viajes solo si son de montreal
+- **Montreal stations**: filtra los stations solo si son de montreal.
+- **Station processor**: envia las stations a Montreal Stations y a Trip count (solo la información que necesitan).
+- **Harversine Distance**: calcula para cada viaje la distancia entre la estación de principio y final.
+- **Distance mean**: guarda las distancias promedio recorridas hacia las estaciones, al finalizar filtra por un promedio mayor a 6Km.
 
 ## Protocolo de comunicación
 
@@ -118,3 +132,10 @@ Por ejemplo cuando finalizan de recibirse todas los mensajes de tipo stations, l
 
 ![](./diagrams/Secuencia.jpg)
 *Diagrama de secuancia: envio de eof (stations)*
+
+Uno de los contras que tiene este sistema de comunicación de EOF es que puede ocurrir que algunos de los nodos `B` sigan funcionando mientras otros ya se desconectaron. Además, solo sirve para EOFs, si uno quisiera mandar un "TAG" o algo como "Guarda cache todo lo que hiciste hasta ahora pero seguí trabajando" no podrías hacerlo con este método.
+
+La ventaja de este método es que de una manera muy sencilla se puede manejar el fin de comunicación de N a M workers.
+
+## Performance
+El sistema devuelve consistentemente el resultado de las queries en un tiempo de 23 minutos sin utilizar replicación. Y en un tiempo de unos 14 minutos utilizandola.
