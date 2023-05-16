@@ -138,4 +138,11 @@ Uno de los contras que tiene este sistema de comunicación de EOF es que puede o
 La ventaja de este método es que de una manera muy sencilla se puede manejar el fin de comunicación de N a M workers.
 
 ## Performance
-El sistema devuelve consistentemente el resultado de las queries en un tiempo de 23 minutos sin utilizar replicación. Y en un tiempo de unos 14 minutos utilizandola.
+El sistema devuelve consistentemente el resultado de las queries en un tiempo de 23 minutos sin utilizar replicación. Y en un tiempo de unos 14 minutos utilizandola. Los mensajes de tipo weathers y stations, en este caso, con este dataset, se envian del cliente al servidor en menos de 3 segundos, no siendo así el caso de los trips.
+
+En todo el desarrollo del tp, no se presentaron cuellos de botella en ninguna de las colas del programa. Ni siquiera utilizando el sistema sin réplicas.
+
+## Conclusiones
+Hacer el diseño de este sistema fue muy complejo, tomando en cuenta que la arquitectura tiene todo lo necesario como para hacerla de forma distribuida realmente y no solo correrla con docker compose. Además el hecho de que tenga que poder escalar la cantidad de datos que procesa y que se le pueda agregar en un futuro un stream continuo de datos, también le agrega una notoria cantidad de complejidad.
+
+En cuanto a RabbitMQ, resultó una herramienta de trabajo muy potente, ya que permite abstraerse de los problemas de tipo recurso compartido, race conditions, almacenamiento y administración de los mensajes en las colas. El dashboard que otorga también brinda una herramienta fundamental para el debugueo. Usando rabbit la comunicación entre workers fue un problema menos.
