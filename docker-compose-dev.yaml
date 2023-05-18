@@ -13,7 +13,7 @@ services:
                 condition: service_healthy
         environment:
             - LOGGING_LEVEL=INFO  
-            - TRIP_PROCESSOR_AMOUNT=3
+            - TRIP_PROCESSOR_AMOUNT=4
             - WEATHER_PROCESSOR_AMOUNT=3
             - STATION_PROCESSOR_AMOUNT=3
         networks:
@@ -87,7 +87,7 @@ services:
                 condition: service_healthy
         environment:
             - LOGGING_LEVEL=DEBUG
-            - TRIP_PROCESSOR_AMOUNT=3
+            - TRIP_PROCESSOR_AMOUNT=4
             - HARVERSINE_DISTANCE_AMOUNT=3
 
     year_filter:
@@ -102,7 +102,7 @@ services:
                 condition: service_healthy
         environment:
             - LOGGING_LEVEL=DEBUG
-            - TRIP_PROCESSOR_AMOUNT=3     
+            - TRIP_PROCESSOR_AMOUNT=4     
 
     stations_processor:
         build: 
@@ -129,7 +129,7 @@ services:
                 condition: service_healthy
         environment:
             - LOGGING_LEVEL=DEBUG
-            - TRIP_PROCESSOR_AMOUNT=3
+            - TRIP_PROCESSOR_AMOUNT=4
             - WEATHER_PROCESSOR_AMOUNT=3
             - DURATION_MEAN_AMOUNT=3  
     
@@ -239,6 +239,8 @@ services:
         ports:
             - 5672:5672
             - 15672:15672
+        volumes:
+            - ./server/20-logging.conf:/etc/rabbitmq/conf.d/20-logging.conf
         healthcheck:
             test: rabbitmq-diagnostics -q ping
             interval: 10s
