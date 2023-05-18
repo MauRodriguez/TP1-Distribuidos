@@ -32,10 +32,10 @@ class HaversineDistance :
 
         for row in rows:
             cols = row.split(',')
-            if len(cols) < 2: continue
-            if cols[0] not in self.stations or cols[1] not in self.stations: continue
-            city_1 = self.stations[cols[0]]
-            city_2 = self.stations[cols[1]]
+            if len(cols) < 3: continue
+            if (cols[0],cols[2]) not in self.stations or (cols[1],cols[2]) not in self.stations: continue
+            city_1 = self.stations[(cols[0],cols[2])]
+            city_2 = self.stations[(cols[1],cols[2])]
 
             if (city_1,city_2) not in self.distances:
                 self.distances[(city_1,city_2)] = haversine((city_1[1],city_1[2]),(city_2[1],city_2[2]))
@@ -62,7 +62,7 @@ class HaversineDistance :
         for row in rows:
             cols = row.split(',')
             if len(cols) < 4: continue
-            self.stations[cols[0]] = (cols[1],float(cols[2]), float(cols[3]))
+            self.stations[(cols[0],cols[4])] = (cols[1],float(cols[2]), float(cols[3]))
     
     def stop(self):
         self.rabbit.close()

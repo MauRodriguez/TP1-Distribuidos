@@ -30,13 +30,14 @@ class MontrealStations:
 
         for row in rows:
             cols = row.split(',')
-            if len(cols) < 5: continue
+            if len(cols) < 6: continue
             if cols[0] == MONTREAL:
                 code = cols[1] 
                 name = cols[2]
                 lat = cols[3]
                 long = cols[4]
-                filter_data += code + "," + name + "," + lat + "," + long + ";"
+                year = cols[5]
+                filter_data += code + "," + name + "," + lat + "," + long + "," + year + ";"
                 
         if filter_data != "":
             self.rabbit.publish("","montreal_stations",filter_data)

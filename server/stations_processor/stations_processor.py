@@ -27,13 +27,14 @@ class StationsProcessor :
 
         for row in rows:
             cols = row.split(',') 
-            if len(cols) < 5: continue
+            if len(cols) < 6: continue
             city = cols[0]
             code = cols[1] 
             name = cols[2]
             lat = cols[3]
             long = cols[4]
-            harversine_data += city + "," + code + "," + name + "," + lat + "," + long + ";"  
+            year = cols[5]
+            harversine_data += city + "," + code + "," + name + "," + lat + "," + long + "," + year+ ";"  
             trip_counter_data += city + code + "," + name + ";"
 
         if harversine_data != "":

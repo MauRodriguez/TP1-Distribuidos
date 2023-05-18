@@ -29,11 +29,12 @@ class MontrealTrips:
 
         for row in rows:
             cols = row.split(',')
-            if len(cols) < 3: continue
+            if len(cols) < 4: continue
             if cols[0] == MONTREAL:
                 start_code = cols[1]
                 end_code = cols[2]
-                filter_data += start_code + "," + end_code + ";"
+                year = cols[3]
+                filter_data += start_code + "," + end_code + "," + year + ";"
         if filter_data != "":
             self.rabbit.publish("","montreal_trips",filter_data)
         

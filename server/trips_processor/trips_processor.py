@@ -38,7 +38,7 @@ class TripsProcessor :
             duration = cols[5]
             year = cols[7]
             trip_duration_data += city + "," + date + "," + duration + ";" 
-            start_end_code_trip_data += city + "," + start_code + "," + end_code + ";"
+            start_end_code_trip_data += city + "," + start_code + "," + end_code + "," + year + ";"
             year_data += year + "," + city + start_code + ";"
 
         if trip_duration_data != "":

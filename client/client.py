@@ -33,8 +33,11 @@ class Client:
             self.send_msg(STATION, END.encode("utf-8"))
 
             self.read_and_send("montreal", "trips", TRIP)
+            logging.info(f"action: end of sending MONTREAL trips")
             self.read_and_send("toronto", "trips", TRIP)
-            self.read_and_send("washington", "trips", TRIP)  
+            logging.info(f"action: end of sending TORONTO trips")
+            self.read_and_send("washington", "trips", TRIP) 
+            logging.info(f"action: end of sending WASHINGTON trips") 
             self.send_msg(TRIP, END.encode("utf-8"))      
             logging.info(f"action: end of sending trips")
 

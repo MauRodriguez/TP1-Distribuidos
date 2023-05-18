@@ -7,7 +7,7 @@ all:
 
 docker-compose-up: 
 	docker compose -f docker-compose-dev.yaml up -d --build \
-	--scale trips_processor=4 --scale weather_processor=3 --scale stations_processor=3 \
+	--scale trips_processor=3 --scale weather_processor=3 --scale stations_processor=3 \
 	--scale montreal_stations=3 --scale harversine_distance=3 --scale montreal_trips=3 \
 	--scale distance_mean=3 --scale duration_mean=3 --scale year_filter=3
 .PHONY: docker-compose-up
