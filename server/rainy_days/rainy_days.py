@@ -16,6 +16,7 @@ class RainyDays :
 
     def callback_trips(self, ch, method, properties, body):
         body = body.decode('utf-8')
+        ch.basic_ack(delivery_tag=method.delivery_tag)
         if body == END:
             self.trip_processor_amount -= 1
             if self.trip_processor_amount == 0:
@@ -38,7 +39,8 @@ class RainyDays :
             self.rabbit.publish("","rainy_trips",filter_data)
 
     def callback_weather(self, ch, method, properties, body):
-        body = body.decode('utf-8')        
+        body = body.decode('utf-8')
+        ch.basic_ack(delivery_tag=method.delivery_tag)        
         if body == END:
             self.weather_processor_amount -= 1
             if self.weather_processor_amount == 0:

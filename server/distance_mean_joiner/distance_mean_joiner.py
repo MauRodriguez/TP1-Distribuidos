@@ -32,6 +32,7 @@ class DistanceMeanJoiner:
 
     def callback(self, ch, method, properties, body):
         body = body.decode('utf-8')
+        ch.basic_ack(delivery_tag=method.delivery_tag)
         if body == END:
             self.distance_mean_amount -= 1
             if self.distance_mean_amount == 0:

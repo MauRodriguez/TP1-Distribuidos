@@ -12,6 +12,7 @@ class StationsProcessor :
 
     def callback(self, ch, method, properties, body):
         body = body.decode('utf-8')
+        ch.basic_ack(delivery_tag=method.delivery_tag)
         if body == END:
             logging.info("End of stations received")
             for i in range(0, self.montreal_station_amount):

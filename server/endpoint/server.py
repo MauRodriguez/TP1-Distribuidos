@@ -44,6 +44,7 @@ class Server:
 
     def send_results(self, ch, method, properties, body):
         body = body.decode('utf-8')
+        ch.basic_ack(delivery_tag=method.delivery_tag)
         if body[-2] == END:
             self.queries_finished += 1
 

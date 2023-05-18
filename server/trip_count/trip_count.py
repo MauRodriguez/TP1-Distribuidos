@@ -32,6 +32,7 @@ class TripCount :
 
     def callback_trips(self, ch, method, properties, body):
         body = body.decode('utf-8')
+        ch.basic_ack(delivery_tag=method.delivery_tag)
         if body == END:
             self.year_filter_amount -= 1
             if self.year_filter_amount == 0:
@@ -56,7 +57,8 @@ class TripCount :
                 self.counts[self.stations[cols[1]]][1] = trips_17 + 1
 
     def callback_stations(self, ch, method, properties, body):
-        body = body.decode('utf-8')        
+        body = body.decode('utf-8')
+        ch.basic_ack(delivery_tag=method.delivery_tag)        
         if body == END:
             self.station_processor_amount -= 1
             if self.station_processor_amount == 0:

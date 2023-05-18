@@ -13,6 +13,7 @@ class TripsProcessor :
 
     def callback(self, ch, method, properties, body):        
         body = body.decode('utf-8')
+        ch.basic_ack(delivery_tag=method.delivery_tag)
         if body == END:
             logging.info("End of trips received")
             self.rabbit.publish("","trip_duration", body) 

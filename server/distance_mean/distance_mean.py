@@ -28,6 +28,7 @@ class DistanceMean:
 
     def callback(self, ch, method, properties, body):
         body = body.decode('utf-8')
+        ch.basic_ack(delivery_tag=method.delivery_tag)
         if body == END:
             self.harversine_distance_amount -= 1
             if self.harversine_distance_amount == 0:

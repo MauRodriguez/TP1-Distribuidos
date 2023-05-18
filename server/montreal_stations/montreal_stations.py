@@ -13,7 +13,8 @@ class MontrealStations:
         self.harversine_distance_amount = harversine_distance_amount
 
     def callback(self, ch, method, properties, body):
-        body = body.decode('utf-8')        
+        body = body.decode('utf-8')
+        ch.basic_ack(delivery_tag=method.delivery_tag)        
         if body == END:
             self.station_processor_amount -= 1
             logging.info("recibo end en montreal stations")

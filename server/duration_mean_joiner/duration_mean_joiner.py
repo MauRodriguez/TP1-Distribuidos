@@ -31,6 +31,7 @@ class DurationMeanJoiner:
 
     def callback(self, ch, method, properties, body):
         body = body.decode('utf-8')
+        ch.basic_ack(delivery_tag=method.delivery_tag)
         if body == END:
             self.duration_mean_amount -= 1
             if self.duration_mean_amount == 0:

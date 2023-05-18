@@ -13,7 +13,8 @@ class YearFilter:
         self.trip_processor_amount = trip_processor_amount
 
     def callback(self, ch, method, properties, body):
-        body = body.decode('utf-8')        
+        body = body.decode('utf-8')
+        ch.basic_ack(delivery_tag=method.delivery_tag)        
         if body == END:
             self.trip_processor_amount -= 1
             if self.trip_processor_amount == 0:

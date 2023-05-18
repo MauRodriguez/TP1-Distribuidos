@@ -35,7 +35,7 @@ class Rabbitmq:
     def consume(self, queue, callback):
         if queue not in self.queues:
             self.declare_queue(queue)
-        self.channel.basic_consume(queue=queue, on_message_callback=callback, auto_ack=True)
+        self.channel.basic_consume(queue=queue, on_message_callback=callback, auto_ack=False)
         self.start_consuming()
     
     def start_consuming(self):

@@ -18,6 +18,7 @@ class HaversineDistance :
 
     def callback_trips(self, ch, method, properties, body):
         body = body.decode('utf-8')
+        ch.basic_ack(delivery_tag=method.delivery_tag)
         if body == END:
             self.montreal_trips_amount -= 1            
             if self.montreal_trips_amount == 0:
@@ -47,6 +48,7 @@ class HaversineDistance :
 
     def callback_stations(self, ch, method, properties, body):
         body = body.decode('utf-8')
+        ch.basic_ack(delivery_tag=method.delivery_tag)
         if body == END:
             self.montreal_station_amount -= 1
             logging.info("recibo un end")
